@@ -1,7 +1,3 @@
-// NOTA(RECKER): Iniciar variables
-const dotenv = require('dotenv');
-dotenv.config();
-
 // NOTA(RECKER): DB
 require('./db/DB');
 const Database = require('sqlite-async');
