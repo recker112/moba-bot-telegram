@@ -19,6 +19,7 @@
   "homepage": "https://github.com/recker112/moba-bot-telegram#readme",
   "dependencies": {
     "dotenv": "^8.2.0",
+    "express": "^4.17.1",
     "sqlite-async": "^1.1.1",
     "telegraf": "^4.3.0"
   },
