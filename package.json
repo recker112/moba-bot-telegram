@@ -1,0 +1,28 @@
+{
+  "name": "moba-bot-telegram",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "node bot.js",
+    "dev": "nodemon bot.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://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@github.com/recker112/moba-bot-telegram.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/recker112/moba-bot-telegram/issues"
+  },
+  "homepage": "https://github.com/recker112/moba-bot-telegram#readme",
+  "dependencies": {
+    "dotenv": "^8.2.0",
+    "sqlite-async": "^1.1.1",
+    "telegraf": "^4.3.0"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.7"
+  }
+}
