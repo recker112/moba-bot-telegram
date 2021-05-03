@@ -18,11 +18,33 @@ const start_db = async () => {
 		id INTEGER PRIMARY KEY,
 		user_id BIGINTEGER,
 		points BIGINTEGER NOT NULL DEFAULT 0,
-		insults BIGINTEGER NOT NULL DEFAULT 0
+		insults BIGINTEGER NOT NULL DEFAULT 0,
+		aggressiveness FLOAT NOT NULL DEFAULT 0,
+		pateria FLOAT NOT NULL DEFAULT 0
 	);`
 	
 	await db.run(sql);
-	console.log('¡DB iniciada!');
+	
+	// NOTA(RECKER): Tabla config
+	sql = `CREATE TABLE IF NOT EXISTS config (
+		id INTEGER PRIMARY KEY,
+		double_exp BOOLEAN DEFAULT 0
+	);`
+	
+	await db.run(sql);
+	
+	sql = "INSERT INTO config (double_exp) VALUES (0)";
+	
+	await db.run(sql);
+	
+	// NOTA(RECKER): Tabla words
+	sql = `CREATE TABLE IF NOT EXISTS words (
+		word VARCHAR(50) NOT NULL UNIQUE,
+		status INTEGER NOT NULL DEFAULT 1
+	);`
+	
+	await db.run(sql);
+	console.log('DB iniciada!');
 }
 
 start_db();
