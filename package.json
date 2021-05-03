@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "node server.js",
+    "start": "pm2 start index.js",
     "bot": "node index.js",
     "deployment": "pm2 start index.js",
     "dev": "nodemon index.js"
