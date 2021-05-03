@@ -7,7 +7,7 @@
     "start": "node server.js",
     "bot": "node index.js",
     "deployment": "pm2 start index.js",
-		"dev": "nodemon index.js"
+    "dev": "nodemon index.js"
   },
   "repository": {
     "type": "git",
@@ -22,12 +22,12 @@
   "dependencies": {
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
+    "pm2": "^4.5.6",
     "sqlite-async": "^1.1.1",
     "telegraf": "^4.3.0",
     "telegraf-session-local": "^2.1.0"
   },
   "devDependencies": {
-    "nodemon": "^2.0.7",
-    "pm2": "^4.5.6"
+    "nodemon": "^2.0.7"
   }
 }
