@@ -7,8 +7,11 @@ const addword_soft = async (ctx) => {
 	let word = ctx.message.text.slice(ctx.message.entities[0].length + 1);
 	
 	if (!word.length) {
-		ctx.reply('Debe de colocar una palabra\nEJ: /addword_soft palabra');
-		ctx.deleteMessage(ctx.message_id);
+		let response = await ctx.reply('Debe de colocar una palabra\nEJ: /addword_soft palabra');
+		setTimeout(() => {
+			ctx.deleteMessage(response.message_id);
+			ctx.deleteMessage(ctx.message_id || ctx.message.message_id);
+		}, 2000);
 		return null;
 	}
 	
@@ -29,14 +32,14 @@ const addword_soft = async (ctx) => {
 		let response = await ctx.replyWithMarkdown('¡Palabra agregada!');
 		setTimeout(() => {
 			ctx.deleteMessage(response.message_id);
-			ctx.deleteMessage(ctx.message_id);
+			ctx.deleteMessage(ctx.message_id || ctx.message.message_id);
 		}, 2000);
 	}catch (e) {
 		console.log(e);
 		let response = await ctx.replyWithMarkdown('La palabra introducida ya se encuentra registrada, intente de nuevo.');
 		setTimeout(() => {
 			ctx.deleteMessage(response.message_id);
-			ctx.deleteMessage(ctx.message_id);
+			ctx.deleteMessage(ctx.message_id || ctx.message.message_id);
 		}, 2000);
 	}
 	await client.end();
@@ -46,8 +49,11 @@ const addword = async (ctx) => {
 	let word = ctx.message.text.slice(ctx.message.entities[0].length + 1);
 	
 	if (!word.length) {
-		ctx.replyWithMarkdown('Debe de colocar una palabra\nEJ: /addword palabra');
-		ctx.deleteMessage(ctx.message_id);
+		let response = await ctx.replyWithMarkdown('Debe de colocar una palabra\nEJ: /addword palabra');
+		setTimeout(() => {
+			ctx.deleteMessage(response.message_id);
+			ctx.deleteMessage(ctx.message_id || ctx.message.message_id);
+		}, 2000);
 		return null;
 	}
 	
@@ -68,14 +74,14 @@ const addword = async (ctx) => {
 		let response = await ctx.replyWithMarkdown('¡Palabra agregada!');
 		setTimeout(() => {
 			ctx.deleteMessage(response.message_id);
-			ctx.deleteMessage(ctx.message_id);
+			ctx.deleteMessage(ctx.message_id || ctx.message.message_id);
 		}, 2000);
 	}catch (e) {
 		console.log(e);
 		let response = await ctx.replyWithMarkdown('La palabra introducida ya se encuentra registrada, intente de nuevo.');
 		setTimeout(() => {
 			ctx.deleteMessage(response.message_id);
-			ctx.deleteMessage(ctx.message_id);
+			ctx.deleteMessage(ctx.message_id || ctx.message.message_id);
 		}, 2000);
 	}
 	
@@ -106,7 +112,7 @@ const wordlist = async (ctx) => {
 ${wordsList}`);
 	setTimeout(() => {
 		ctx.deleteMessage(response.message_id);
-		ctx.deleteMessage(ctx.message_id);
+		ctx.deleteMessage(ctx.message_id || ctx.message.message_id);
 	}, 10000);
 	
 	await client.end();
@@ -115,8 +121,11 @@ ${wordsList}`);
 const removeword = async (ctx) => {
 	let word = ctx.message.text.slice(ctx.message.entities[0].length + 1);
 	if (!word.length) {
-		ctx.replyWithMarkdown('Debe de colocar una palabra\nEJ: /removeword palabra');
-		ctx.deleteMessage(ctx.message_id);
+		let response = await ctx.replyWithMarkdown('Debe de colocar una palabra\nEJ: /removeword palabra');
+		setTimeout(() => {
+			ctx.deleteMessage(response.message_id);
+			ctx.deleteMessage(ctx.message_id || ctx.message.message_id);
+		}, 2000);
 		return null;
 	}
 	
@@ -141,14 +150,14 @@ const removeword = async (ctx) => {
 		let response = await ctx.replyWithMarkdown('¡Palabra eliminada!');
 		setTimeout(() => {
 			ctx.deleteMessage(response.message_id);
-			ctx.deleteMessage(ctx.message_id);
+			ctx.deleteMessage(ctx.message_id || ctx.message.message_id);
 		}, 2000);
 	}catch (e) {
 		console.log(e);
 		let response = await ctx.replyWithMarkdown('La palabra introducida no se encuentra registrada, intente de nuevo.');
 		setTimeout(() => {
 			ctx.deleteMessage(response.message_id);
-			ctx.deleteMessage(ctx.message_id);
+			ctx.deleteMessage(ctx.message_id || ctx.message.message_id);
 		}, 2000);
 	}
 	
@@ -159,8 +168,11 @@ const addgolpe = async (ctx) => {
 	let golpe = ctx.message.text.slice(ctx.message.entities[0].length + 1);
 	
 	if (!golpe.length) {
-		ctx.replyWithMarkdown('Debe de colocar una palabra\nEJ: /addgolpe palabra');
-		ctx.deleteMessage(ctx.message_id);
+		let response =  await ctx.replyWithMarkdown('Debe de colocar una palabra\nEJ: /addgolpe palabra');
+		setTimeout(() => {
+			ctx.deleteMessage(response.message_id);
+			ctx.deleteMessage(ctx.message_id || ctx.message.message_id);
+		}, 2000);
 		return null;
 	}
 	
@@ -181,14 +193,14 @@ const addgolpe = async (ctx) => {
 		let response = await ctx.replyWithMarkdown('¡Golpe agregado!');
 		setTimeout(() => {
 			ctx.deleteMessage(response.message_id);
-			ctx.deleteMessage(ctx.message_id);
+			ctx.deleteMessage(ctx.message_id || ctx.message.message_id);
 		}, 2000);
 	}catch (e) {
 		console.log(e);
 		let response = await ctx.replyWithMarkdown('El golpe introducido ya se encuentra registrada, intente de nuevo.');
 		setTimeout(() => {
 			ctx.deleteMessage(response.message_id);
-			ctx.deleteMessage(ctx.message_id);
+			ctx.deleteMessage(ctx.message_id || ctx.message.message_id);
 		}, 2000);
 	}
 	
@@ -219,7 +231,7 @@ const golpelist = async (ctx) => {
 ${golpeList}`);
 	setTimeout(() => {
 		ctx.deleteMessage(response.message_id);
-		ctx.deleteMessage(ctx.message_id);
+		ctx.deleteMessage(ctx.message_id || ctx.message.message_id);
 	}, 10000);
 	
 	await client.end();
@@ -228,8 +240,11 @@ ${golpeList}`);
 const removegolpe = async (ctx) => {
 	let golpe = ctx.message.text.slice(ctx.message.entities[0].length + 1);
 	if (!golpe.length) {
-		ctx.replyWithMarkdown('Debe de colocar una palabra\nEJ: /removegolpe palabra');
-		ctx.deleteMessage(ctx.message_id);
+		let response = await ctx.replyWithMarkdown('Debe de colocar una palabra\nEJ: /removegolpe palabra');
+		setTimeout(() => {
+			ctx.deleteMessage(response.message_id);
+			ctx.deleteMessage(ctx.message_id || ctx.message.message_id);
+		}, 2000);
 		return null;
 	}
 	
@@ -254,14 +269,14 @@ const removegolpe = async (ctx) => {
 		let response = await ctx.replyWithMarkdown('¡Golpe eliminado!');
 		setTimeout(() => {
 			ctx.deleteMessage(response.message_id);
-			ctx.deleteMessage(ctx.message_id);
+			ctx.deleteMessage(ctx.message_id || ctx.message.message_id);
 		}, 2000);
 	}catch (e) {
 		console.log(e);
 		let response = await ctx.replyWithMarkdown('El golpe introducido no se encuentra registrado, intente de nuevo.');
 		setTimeout(() => {
 			ctx.deleteMessage(response.message_id);
-			ctx.deleteMessage(ctx.message_id);
+			ctx.deleteMessage(ctx.message_id || ctx.message.message_id);
 		}, 2000);
 	}
 	
@@ -300,8 +315,11 @@ const calculate_level_down = (xp, level_user, xp_need) => {
 
 const addxp = async (ctx) => {
 	if (ctx.message.entities.length !== 2) {
-		ctx.replyWithMarkdown('Debe de mencionar a un usuario\nEJ: /addxp @usuario cantidad');
-		ctx.deleteMessage(ctx.message_id);
+		let response = await ctx.replyWithMarkdown('Debe de mencionar a un usuario\nEJ: /addxp @usuario cantidad');
+		setTimeout(() => {
+			ctx.deleteMessage(response.message_id);
+			ctx.deleteMessage(ctx.message_id || ctx.message.message_id);
+		}, 2000);
 		return null;
 	}
 	
@@ -314,7 +332,7 @@ const addxp = async (ctx) => {
 	
 	if (!add.length) {
 		ctx.replyWithMarkdown('Debe de colocar una cantidad\nEJ: /addxp @usuario cantidad');
-		ctx.deleteMessage(ctx.message_id);
+		ctx.deleteMessage(ctx.message_id || ctx.message.message_id);
 		return null;
 	}
 	add = parseInt(add);
@@ -363,14 +381,14 @@ WHERE user_id=$2`;
 		let response = await ctx.replyWithMarkdown('¡Experiencia agregada!');
 		setTimeout(() => {
 			ctx.deleteMessage(response.message_id);
-			ctx.deleteMessage(ctx.message_id);
+			ctx.deleteMessage(ctx.message_id || ctx.message.message_id);
 		}, 2000);
 	}catch (e) {
 		console.log(e);
 		let response = await ctx.replyWithMarkdown('Se produjo un error al intentar agregar xp al usuario.');
 		setTimeout(() => {
 			ctx.deleteMessage(response.message_id);
-			ctx.deleteMessage(ctx.message_id);
+			ctx.deleteMessage(ctx.message_id || ctx.message.message_id);
 		}, 2000);
 	}
 	
@@ -379,8 +397,11 @@ WHERE user_id=$2`;
 
 const removexp = async (ctx) => {
 	if (ctx.message.entities.length !== 2) {
-		ctx.replyWithMarkdown('Debe de mencionar a un usuario\nEJ: /removexp @usuario cantidad');
-		ctx.deleteMessage(ctx.message_id);
+		let response = await ctx.replyWithMarkdown('Debe de mencionar a un usuario\nEJ: /removexp @usuario cantidad');
+		setTimeout(() => {
+			ctx.deleteMessage(response.message_id);
+			ctx.deleteMessage(ctx.message_id || ctx.message.message_id);
+		}, 2000);
 		return null;
 	}
 	
@@ -393,7 +414,7 @@ const removexp = async (ctx) => {
 	
 	if (!remove.length) {
 		ctx.replyWithMarkdown('Debe de colocar una cantidad\nEJ: /removexp @usuario cantidad');
-		ctx.deleteMessage(ctx.message_id);
+		ctx.deleteMessage(ctx.message_id || ctx.message.message_id);
 		return null;
 	}
 	remove = parseInt(remove);
@@ -442,14 +463,14 @@ WHERE user_id=$2`;
 		let response = await ctx.replyWithMarkdown('¡Experiencia removida!');
 		setTimeout(() => {
 			ctx.deleteMessage(response.message_id);
-			ctx.deleteMessage(ctx.message_id);
+			ctx.deleteMessage(ctx.message_id || ctx.message.message_id);
 		}, 2000);
 	}catch (e) {
 		console.log(e);
 		let response = await ctx.replyWithMarkdown('Se produjo un error al intentar remover xp al usuario.');
 		setTimeout(() => {
 			ctx.deleteMessage(response.message_id);
-			ctx.deleteMessage(ctx.message_id);
+			ctx.deleteMessage(ctx.message_id || ctx.message.message_id);
 		}, 2000);
 	}
 	

@@ -19,9 +19,10 @@ const registrar = async (ctx) => {
 	// NOTA(RECKER): Evitar el registro
 	if (user) {
 		let response = await ctx.reply('Ya estás registrado');
+		
 		setTimeout(() => {
 			ctx.deleteMessage(response.message_id);
-			ctx.deleteMessage(ctx.message_id);
+			ctx.deleteMessage(ctx.message_id || ctx.message.message_id);
 		}, 5000);
 		
 		await client.end();
@@ -85,7 +86,7 @@ const stats = async (ctx) => {
 		let response = await ctx.replyWithMarkdown('Debes de registrarte primero\nUsa /help para más información');
 		setTimeout(() => {
 			ctx.deleteMessage(response.message_id);
-			ctx.deleteMessage(ctx.message_id);
+			ctx.deleteMessage(ctx.message_id || ctx.message.message_id);
 		}, 5000);
 		
 		await client.end();
@@ -132,7 +133,7 @@ _Perdidas: ${loses.count}_`;
 	let response = await ctx.replyWithMarkdown(text);
 	setTimeout(() => {
 		ctx.deleteMessage(response.message_id);
-		ctx.deleteMessage(ctx.message_id);
+		ctx.deleteMessage(ctx.message_id || ctx.message.message_id);
 	}, 20000);
 	
 	await client.end();

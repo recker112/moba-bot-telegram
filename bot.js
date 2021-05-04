@@ -21,6 +21,7 @@ const bot = new Telegraf(process.env.BOT_TOKEN);
 
 // NOTA(RECKER): Configuraciones de puntos
 const double = 4;
+process.env.VERSION = 'v1.0.2';
 
 bot.telegram.getMe().then((botInfo) => {
 	bot.options.username = botInfo.username
@@ -55,7 +56,7 @@ bot.command('cuenta', async ctx => {
 
 // NOTA(RECKER): Pelea
 bot.command('pelea', async (ctx) => {
-	fight.pelea(ctx);
+	fight.pelea(ctx, double);
 });
 
 // NOTA(RECKER): Ver stats

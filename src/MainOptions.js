@@ -2,8 +2,8 @@ const start = async (ctx) => {
 	ctx.replyWithMarkdown('Bot moba *privado*');
 }
 
-const help = (ctx) => {
-	ctx.replyWithMarkdown(`|-------------- *MOBA RANK* --------------|
+const help = async (ctx) => {
+	let response = await ctx.replyWithMarkdown(`|-------------- *MOBA RANK ${process.env.VERSION}* --------------|
 Puedes usar los siguientes comandos para interactuar con el sistema:
 /registrar - Crea una cuenta para unirte a la batalla
 /status - Ve tus puntajes, daño y demás
@@ -18,10 +18,15 @@ Simplemente escribe un mensaje y ya estarás jugando. La *Agresividad* sube cuan
 También si mencionas a otra persona @usuaro o simplemente respondes un comentario con alguna de estas dos tipos de palabras, sus efectos serán aplicados.
 
 Si tienes curiosidad puedes ver el código [aquí](https://github.com/recker112/moba-bot-telegram)`);
+	
+	setTimeout(() => {
+		ctx.deleteMessage(response.message_id);
+		ctx.deleteMessage(ctx.message_id || ctx.message.message_id);
+	}, 30000);
 }
 
-const settings = (ctx) => {
-	ctx.replyWithMarkdown(`|-------------- *MOBA RANK CONFIG* --------------|
+const settings = async (ctx) => {
+	let response = await ctx.replyWithMarkdown(`|-------------- *MOBA RANK CONFIG ${process.env.VERSION}* --------------|
 Puedes usar los siguientes comandos para configurar el sistema:
 /addword_soft - Aregar una palabra cariñosa a la lista
 /addword - Aregar una palabra agresiva a la lista
@@ -30,6 +35,11 @@ Puedes usar los siguientes comandos para configurar el sistema:
 /removegolpe - Elimina un golpe de la lista
 /addxp - Agregar xp a un usuario
 /removexp - Elimina xp a un usuario`);
+	
+	setTimeout(() => {
+		ctx.deleteMessage(response.message_id);
+		ctx.deleteMessage(ctx.message_id || ctx.message.message_id);
+	}, 30000);
 }
 
 module.exports = {

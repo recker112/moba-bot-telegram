@@ -3,9 +3,9 @@ const { Client } = require('pg');
 
 const main = async (ctx, double) => {
 	// NOTA(RECKER): No contar puntos si no es el grupo definido
-	if (ctx.chat.id !== -1001200393360) {
+	/*if (ctx.chat.id !== -1001200393360) {
 		return null;
-	}
+	}*/
 
 	const client = new Client({
 		connectionString: process.env.DATABASE_URL,
@@ -35,7 +35,7 @@ const main = async (ctx, double) => {
 	// NOTA(RECKER): Registrar otras que no sean mensajes
 	if (!ctx.message.text) {
 		sql = `UPDATE experiences
-			SET points=points+${(config.points_base * 2) * (config.double_exp ? double : 1)}, pateria=CASE WHEN pateria > 8 THEN pateria - 8 ELSE 0 END, aggressiveness=CASE WHEN aggressiveness > 8 THEN aggressiveness - 8 ELSE 0 END
+			SET points=points+${(config.points_base * 2) * (config.double_exp ? double : 1)}, pateria=CASE WHEN pateria > 2.5 THEN pateria - 2.5 ELSE 0 END, aggressiveness=CASE WHEN aggressiveness > 4.5 THEN aggressiveness - 4.5 ELSE 0 END
 			WHERE user_id=$1`;
 		
 		await client.query(sql,[ctx.from.id]);
@@ -109,14 +109,14 @@ aggressiveness=aggressiveness+8
 		experiences.points += (config.points_base * 2) * (config.double_exp ? double : 1);
 		
 		sql = `UPDATE experiences
-		SET points=${experiences.points}, pateria=pateria+8
+		SET points=${experiences.points}, pateria=CASE WHEN pateria < 100 THEN pateria + 8 ELSE 100 END
 		WHERE user_id=$1`;
 	}else if (findWords === 2) {
 		// NOTA(RECKER): Mensaje cariñoso
 		experiences.points += (config.points_base * 2) * (config.double_exp ? double : 1);
 		
 		sql = `UPDATE experiences
-		SET points=${experiences.points}, pateria=pateria+5
+		SET points=${experiences.points}, pateria=CASE WHEN pateria < 100 THEN pateria + 5 ELSE 100 END
 		WHERE user_id=$1`;
 	}else if (findWords === 1) {
 		// NOTA(RECKER): Mensaje con palabra
@@ -130,7 +130,7 @@ aggressiveness=aggressiveness+8
 		experiences.points += config.points_base * (config.double_exp ? double : 1);
 		
 		sql = `UPDATE experiences
-		SET points=${experiences.points}, pateria=CASE WHEN pateria > 8 THEN pateria - 8 ELSE 0 END, aggressiveness=CASE WHEN aggressiveness > 8 THEN aggressiveness - 8 ELSE 0 END
+		SET points=${experiences.points}, pateria=CASE WHEN pateria > 2.5 THEN pateria - 2.5 ELSE 0 END, aggressiveness=CASE WHEN aggressiveness > 4.5 THEN aggressiveness - 4.5 ELSE 0 END
 		WHERE user_id=$1`;
 	}
 	

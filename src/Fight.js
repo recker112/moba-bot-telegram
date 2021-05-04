@@ -5,13 +5,13 @@ function getRandomInt(min, max) {
   return Math.round(Math.random() * (max - min)) + min;
 }
 
-const pelea = async (ctx) => {
-	// NOTA(RECKER): Validad mencion
+const pelea = async (ctx, double) => {
+	// NOTA(RECKER): Validar mencion
 	if (ctx.message.entities.length !== 2) {
 		let response = await ctx.replyWithMarkdown('Debe de mencionar a un usuario\nEJ: /pelea @usuario');
 		setTimeout(() => {
 			ctx.deleteMessage(response.message_id);
-			ctx.deleteMessage(ctx.message_id);
+			ctx.deleteMessage(ctx.message_id || ctx.message.message_id);
 		}, 5000);
 		return null;
 	}
@@ -20,7 +20,7 @@ const pelea = async (ctx) => {
 		let response = await ctx.replyWithMarkdown('Debe de mencionar a un usuario\nEJ: /pelea @usuario');
 		setTimeout(() => {
 			ctx.deleteMessage(response.message_id);
-			ctx.deleteMessage(ctx.message_id);
+			ctx.deleteMessage(ctx.message_id || ctx.message.message_id);
 		}, 5000);
 		return null;
 	}
@@ -34,7 +34,7 @@ const pelea = async (ctx) => {
 		let response = await ctx.replyWithMarkdown('No puedes pelear contra ese oponente');
 		setTimeout(() => {
 			ctx.deleteMessage(response.message_id);
-			ctx.deleteMessage(ctx.message_id);
+			ctx.deleteMessage(ctx.message_id || ctx.message.message_id);
 		}, 5000);
 		return null;
 	}
@@ -63,7 +63,7 @@ const pelea = async (ctx) => {
 		let response = await ctx.replyWithMarkdown('No hay golpes registrados para poder iniciar una batalla');
 		setTimeout(() => {
 			ctx.deleteMessage(response.message_id);
-			ctx.deleteMessage(ctx.message_id);
+			ctx.deleteMessage(ctx.message_id || ctx.message.message_id);
 		}, 5000);
 		
 		await client.end();
@@ -82,7 +82,7 @@ WHERE users.id=$1`;
 		let response = await ctx.replyWithMarkdown('Debes de registrarte primero\nUsa /help para más información');
 		setTimeout(() => {
 			ctx.deleteMessage(response.message_id);
-			ctx.deleteMessage(ctx.message_id);
+			ctx.deleteMessage(ctx.message_id || ctx.message.message_id);
 		}, 5000);
 		
 		await client.end();
@@ -101,7 +101,7 @@ WHERE users.username=$1`;
 		let response = await ctx.replyWithMarkdown('El usuario que está retando no se encuentra registrado');
 		setTimeout(() => {
 			ctx.deleteMessage(response.message_id);
-			ctx.deleteMessage(ctx.message_id);
+			ctx.deleteMessage(ctx.message_id || ctx.message.message_id);
 		}, 5000);
 		
 		await client.end();
@@ -182,12 +182,12 @@ WHERE users.username=$1`;
 	await client.query(sql, [user_win.user_id,user_lose.user_id]);
 	
 	// NOTA(RECKER): Agregar xp al winner
-	user_win.points += 3;
+	user_win.points += 5 * (config.double_exp ? double : 1);
 	sql = `UPDATE experiences
-		SET points=points+5, aggressiveness=CASE WHEN aggressiveness > 10 THEN aggressiveness - 10 ELSE 0 END, pateria=pateria+20
-		WHERE user_id=$1`;
+		SET points=$1, aggressiveness=CASE WHEN aggressiveness > 10 THEN aggressiveness - 10 ELSE 0 END, pateria=pateria+15
+		WHERE user_id=$2`;
 	
-	await client.query(sql, [user_win.user_id]);
+	await client.query(sql, [user_win.points,user_win.user_id]);
 	
 	// NOTA(RECKER): Agregar agresividad al perdedor
 	sql = `UPDATE experiences
@@ -207,7 +207,7 @@ WHERE users.username=$1`;
 	}
 	
 	setTimeout(() => {
-		ctx.deleteMessage(ctx.message_id);
+		ctx.deleteMessage(ctx.message_id || ctx.message.message_id);
 	}, 5000);
 	
 	await client.end();
