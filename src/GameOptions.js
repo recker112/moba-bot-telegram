@@ -1,11 +1,20 @@
-const Database = require('sqlite-async');
+// NOTA(RECKER): Conectarse a la DB
+const { Client } = require('pg');
 
 const top = async (ctx) => {
-	const db = await Database.open('./moba.db');
+	const client = new Client({
+		connectionString: process.env.DATABASE_URL,
+		ssl: {
+			rejectUnauthorized: false
+		}
+	});
+	
+	await client.connect();
 	
 	let sql = 'SELECT * FROM config WHERE id=1';
 	
-	const config = await db.get(sql);
+	let config = await client.query(sql);
+	config = config.rows[0];
 	
 	sql = `SELECT users.username, users.id, experiences.points, experiences.level, experiences.insults, experiences.aggressiveness, experiences.pateria
 		FROM users
@@ -13,7 +22,8 @@ const top = async (ctx) => {
 		ORDER BY experiences.points DESC
 		LIMIT 5`;
 
-	const users = await db.all(sql);
+	let users = await client.query(sql);
+	users = users.rows;
 
 	let text = '|-------------------- *TOP 5* --------------------|\n';
 	
@@ -35,8 +45,9 @@ const top = async (ctx) => {
 		const porcentaje_alcandado = Math.round((100 * xp_acumulada) / config.xp_need);
 		
 		// NOTA(RECKER): Obtener batallas
-		sql = `SELECT count(user_win) as count FROM fights WHERE user_win=?`;
-		const wins = await db.get(sql,[user.id]);
+		sql = `SELECT count(user_win) as count FROM fights WHERE user_win=$1`;
+		let wins = await client.query(sql,[user.id]);
+		wins = wins.rows[0];
 		
 		text += `*#${i+1} @${user.username}*\n`;
 		text += `- Nivel: ${user.level} (${porcentaje_alcandado}%)\n`;
@@ -57,6 +68,8 @@ const top = async (ctx) => {
 	setTimeout(() => {
 		ctx.deleteMessage(response.message_id);
 	}, 20000);
+	
+	await client.end();
 }
 
 const c_prendio = async (ctx, double) => {
@@ -64,19 +77,30 @@ const c_prendio = async (ctx, double) => {
 		return null;
 	}
 	
-	const db = await Database.open('./moba.db');
+	const client = new Client({
+		connectionString: process.env.DATABASE_URL,
+		ssl: {
+			rejectUnauthorized: false
+		}
+	});
+	
+	await client.connect();
+	
 	let sql = "SELECT * FROM config WHERE id=1";
 	
-	const config = await db.get(sql);
+	let config = await client.query(sql);
+	config = config.rows[0];
 	
-	sql = "UPDATE config SET double_exp=? WHERE id=1";
-	const res = await db.run(sql,[!config.double_exp]);
+	sql = "UPDATE config SET double_exp=$1 WHERE id=1";
+	const res = await client.query(sql,[!config.double_exp]);
 	
 	if (!config.double_exp) {
 		ctx.replyWithMarkdown(`*MODO AGRESIVIDAD ACTIVA.*\nAhora hay un x${double} en la EXP.`);
 	}else {
 		ctx.replyWithMarkdown('*Se acabó lo que se daba.*\nAhora hay un x1 en la EXP.');
 	}
+	
+	await client.end();
 }
 
 module.exports = {

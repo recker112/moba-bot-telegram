@@ -1,27 +1,44 @@
-const Database = require('sqlite-async');
+// NOTA(RECKER): Conectarse a la DB
+const { Client } = require('pg');
 
 const registrar = async (ctx) => {
-	const db = await Database.open('./moba.db');
+	const client = new Client({
+		connectionString: process.env.DATABASE_URL,
+		ssl: {
+			rejectUnauthorized: false
+		}
+	});
+	
+	await client.connect();
 
-	let sql = 'SELECT * FROM users where id=?';
+	let sql = 'SELECT * FROM users where id=$1';
 
-	const user = await db.get(sql,[ctx.from.id]);
+	let user = await client.query(sql,[ctx.from.id]);
+	user = user.rows[0];
 
 	// NOTA(RECKER): Evitar el registro
 	if (user) {
+		let response = await ctx.reply('Ya estás registrado');
+		setTimeout(() => {
+			ctx.deleteMessage(response.message_id);
+		}, 5000);
+		
+		await client.end();
 		return null;
 	}
+	
+	sql = 'INSERT INTO users (id,username) VALUES ($1,$2)';
+	const res = await client.query(sql,[ctx.from.id, ctx.from.username]);
 
-	sql = 'INSERT INTO users (id,username) VALUES (?,?)';
-	const res = await db.run(sql,[ctx.from.id, ctx.from.username]);
-
-	sql = 'INSERT INTO experiences (user_id) VALUES (?);'
-	const res2 = await db.run(sql,[ctx.from.id]);
+	sql = 'INSERT INTO experiences (user_id) VALUES ($1);'
+	const res2 = await client.query(sql,[ctx.from.id]);
+	
 	ctx.reply(`@${ctx.from.username} se unió al campo de batalla`);
+	await client.end();
 }
 
 const cuenta = async (ctx) => {
-	const db = await Database.open('./moba.db');
+	/*const db = await Database.open('./moba.db');
 
 	let sql = 'SELECT * FROM users where id=?';
 
@@ -37,31 +54,49 @@ const cuenta = async (ctx) => {
 	}
 	
 	const count = await ctx.answerCbQuery();
-	console.log(count);
+	console.log(count);*/
 	
 	ctx.replyWithMarkdown('MENU PARA ACTUALIZAR CUENTA');
 }
 
 const stats = async (ctx) => {
-	const db = await Database.open('./moba.db');
+	const client = new Client({
+		connectionString: process.env.DATABASE_URL,
+		ssl: {
+			rejectUnauthorized: false
+		}
+	});
+	
+	await client.connect();
+	
 	let sql = 'SELECT * FROM config WHERE id=1';
 	
 	// NOTA(RECKER): Obtener datos necesarios
-	const config = await db.get(sql);
+	let config = await client.query(sql);
+	config = config.rows[0];
 	
-	sql = `SELECT * FROM experiences WHERE user_id=?`;
+	sql = `SELECT * FROM experiences WHERE user_id=$1`;
 
-	const experiences = await db.get(sql,[ctx.from.id]);
+	let experiences = await client.query(sql,[ctx.from.id]);
+	experiences = experiences.rows[0];
 	
 	if (!experiences) {
+		let response = await ctx.replyWithMarkdown('Debes de registrarte primero\nUsa /help para más información');
+		setTimeout(() => {
+			ctx.deleteMessage(response.message_id);
+		}, 5000);
+		
+		await client.end();
 		return null;
 	}
 	
 	// NOTA(RECKER): Obtener batallas
-	sql = `SELECT count(user_win) as count FROM fights WHERE user_win=?`;
-	const wins = await db.get(sql,[ctx.from.id]);
-	sql = `SELECT count(user_lose) as count FROM fights WHERE user_lose=?`;
-	const loses = await db.get(sql,[ctx.from.id]);
+	sql = `SELECT count(user_win) as count FROM fights WHERE user_win=$1`;
+	let wins = await client.query(sql,[ctx.from.id]);
+	wins = wins.rows[0];
+	sql = `SELECT count(user_lose) as count FROM fights WHERE user_lose=$1`;
+	let loses = await client.query(sql,[ctx.from.id]);
+	loses = loses.rows[0];
 	
 	// NOTA(RECKER): Calculos
 	const aggressiveness = Math.round10(experiences.aggressiveness, -2);
@@ -96,6 +131,8 @@ _Perdidas: ${loses.count}_`;
 	setTimeout(() => {
 		ctx.deleteMessage(response.message_id);
 	}, 20000);
+	
+	await client.end();
 }
 
 module.exports = {

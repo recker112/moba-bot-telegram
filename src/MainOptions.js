@@ -1,4 +1,4 @@
-const start = (ctx) => {
+const start = async (ctx) => {
 	ctx.replyWithMarkdown('Bot moba *privado*');
 }
 

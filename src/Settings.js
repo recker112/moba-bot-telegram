@@ -1,49 +1,29 @@
-const Database = require('sqlite-async');
+// NOTA(RECKER): Conectarse a la DB
+const { Client } = require('pg');
 
 const addword_soft = async (ctx) => {
 	let entities = ctx.message.entities;
-
+	
 	let word = ctx.message.text.slice(ctx.message.entities[0].length + 1);
 	
 	if (!word.length) {
-		ctx.replyWithMarkdown('Debe de colocar una palabra\nEJ: /addword_soft');
+		ctx.reply('Debe de colocar una palabra\nEJ: /addword_soft palabra');
 		return null;
 	}
 	
-	const db = await Database.open('./moba.db');
+	const client = new Client({
+		connectionString: process.env.DATABASE_URL,
+		ssl: {
+			rejectUnauthorized: false
+		}
+	});
+	
+	await client.connect();
 	
 	try {
-		let sql = 'INSERT INTO words (word,status) VALUES (?,2)';
+		let sql = 'INSERT INTO words (word,status) VALUES ($1,2)';
 			
-		const res = await db.run(sql, [word]);
-		
-		let response = await ctx.replyWithMarkdown('¡Palabra agregada!');
-		setTimeout(() => {
-			ctx.deleteMessage(response.message_id);
-		}, 2000);
-	}catch (e) {
-		console.log(e);
-		let response = await ctx.replyWithMarkdown('La palabra introducida ya se encuentra registrada, intente de nuevo.');;
-		setTimeout(() => {
-			ctx.deleteMessage(response.message_id);
-		}, 2000);
-	}
-}
-
-const addword = async (ctx) => {
-	let word = ctx.message.text.slice(ctx.message.entities[0].length + 1);
-	
-	if (!word.length) {
-		ctx.replyWithMarkdown('Debe de colocar una palabra\nEJ: /addword palabra');
-		return null;
-	}
-	
-	const db = await Database.open('./moba.db');
-	
-	try {
-		let sql = 'INSERT INTO words (word,status) VALUES (?,1)';
-			
-		const res = await db.run(sql, [word]);
+		const res = await client.query(sql, [word]);
 		
 		let response = await ctx.replyWithMarkdown('¡Palabra agregada!');
 		setTimeout(() => {
@@ -56,13 +36,60 @@ const addword = async (ctx) => {
 			ctx.deleteMessage(response.message_id);
 		}, 2000);
 	}
+	await client.end();
+}
+
+const addword = async (ctx) => {
+	let word = ctx.message.text.slice(ctx.message.entities[0].length + 1);
+	
+	if (!word.length) {
+		ctx.replyWithMarkdown('Debe de colocar una palabra\nEJ: /addword palabra');
+		return null;
+	}
+	
+	const client = new Client({
+		connectionString: process.env.DATABASE_URL,
+		ssl: {
+			rejectUnauthorized: false
+		}
+	});
+	
+	await client.connect();
+	
+	try {
+		let sql = 'INSERT INTO words (word,status) VALUES ($1,1)';
+			
+		const res = await client.query(sql, [word]);
+		
+		let response = await ctx.replyWithMarkdown('¡Palabra agregada!');
+		setTimeout(() => {
+			ctx.deleteMessage(response.message_id);
+		}, 2000);
+	}catch (e) {
+		console.log(e);
+		let response = await ctx.replyWithMarkdown('La palabra introducida ya se encuentra registrada, intente de nuevo.');
+		setTimeout(() => {
+			ctx.deleteMessage(response.message_id);
+		}, 2000);
+	}
+	
+	await client.end()
 }
 
 const wordlist = async (ctx) => {
-	const db = await Database.open('./moba.db');
+	const client = new Client({
+		connectionString: process.env.DATABASE_URL,
+		ssl: {
+			rejectUnauthorized: false
+		}
+	});
+	
+	await client.connect();
+	
 	let sql = 'SELECT * FROM words';
 
-	const words = await db.all(sql);
+	let words = await client.query(sql);
+	words = words.rows;
 	
 	let wordsList = '';
 	words.map(({ word, status }) => {
@@ -74,6 +101,8 @@ ${wordsList}`);
 	setTimeout(() => {
 		ctx.deleteMessage(response.message_id);
 	}, 10000);
+	
+	await client.end();
 }
 
 const removeword = async (ctx) => {
@@ -83,12 +112,23 @@ const removeword = async (ctx) => {
 		return null;
 	}
 	
-	const db = await Database.open('./moba.db');
+	const client = new Client({
+		connectionString: process.env.DATABASE_URL,
+		ssl: {
+			rejectUnauthorized: false
+		}
+	});
+	
+	await client.connect();
 	
 	try {
-		let sql = 'DELETE FROM words WHERE word=?';
+		let sql = 'DELETE FROM words WHERE word=$1';
 			
-		const res = await db.run(sql, [word]);
+		const res = await client.query(sql, [word]);
+		
+		if (!res.rowCount) {
+			throw new Error('No register');
+		}
 		
 		let response = await ctx.replyWithMarkdown('¡Palabra eliminada!');
 		setTimeout(() => {
@@ -101,6 +141,8 @@ const removeword = async (ctx) => {
 			ctx.deleteMessage(response.message_id);
 		}, 2000);
 	}
+	
+	await client.end();
 }
 
 const addgolpe = async (ctx) => {
@@ -111,12 +153,19 @@ const addgolpe = async (ctx) => {
 		return null;
 	}
 	
-	const db = await Database.open('./moba.db');
+	const client = new Client({
+		connectionString: process.env.DATABASE_URL,
+		ssl: {
+			rejectUnauthorized: false
+		}
+	});
+	
+	await client.connect();
 	
 	try {
-		let sql = 'INSERT INTO fight_golpes (golpe) VALUES (?)';
+		let sql = 'INSERT INTO fight_golpes (golpe) VALUES ($1)';
 			
-		const res = await db.run(sql, [golpe]);
+		const res = await client.query(sql, [golpe]);
 		
 		let response = await ctx.replyWithMarkdown('¡Golpe agregado!');
 		setTimeout(() => {
@@ -129,13 +178,24 @@ const addgolpe = async (ctx) => {
 			ctx.deleteMessage(response.message_id);
 		}, 2000);
 	}
+	
+	await client.end();
 }
 
 const golpelist = async (ctx) => {
-	const db = await Database.open('./moba.db');
+	const client = new Client({
+		connectionString: process.env.DATABASE_URL,
+		ssl: {
+			rejectUnauthorized: false
+		}
+	});
+	
+	await client.connect();
+	
 	let sql = 'SELECT * FROM fight_golpes';
 
-	const golpes = await db.all(sql);
+	let golpes = await client.query(sql);
+	golpes = golpes.rows;
 	
 	let golpeList = '';
 	golpes.map(({ golpe }) => {
@@ -147,6 +207,8 @@ ${golpeList}`);
 	setTimeout(() => {
 		ctx.deleteMessage(response.message_id);
 	}, 10000);
+	
+	await client.end();
 }
 
 const removegolpe = async (ctx) => {
@@ -156,12 +218,23 @@ const removegolpe = async (ctx) => {
 		return null;
 	}
 	
-	const db = await Database.open('./moba.db');
+	const client = new Client({
+		connectionString: process.env.DATABASE_URL,
+		ssl: {
+			rejectUnauthorized: false
+		}
+	});
+	
+	await client.connect();
 	
 	try {
-		let sql = 'DELETE FROM fight_golpes WHERE golpe=?';
+		let sql = 'DELETE FROM fight_golpes WHERE golpe=$1';
 			
-		const res = await db.run(sql, [golpe]);
+		const res = await client.query(sql, [golpe]);
+		
+		if (!res.rowCount) {
+			throw new Error('No register');
+		}
 		
 		let response = await ctx.replyWithMarkdown('¡Golpe eliminado!');
 		setTimeout(() => {
@@ -174,6 +247,8 @@ const removegolpe = async (ctx) => {
 			ctx.deleteMessage(response.message_id);
 		}, 2000);
 	}
+	
+	await client.end();
 }
 
 const calculate_level_up = (xp, xp_need) => {
@@ -225,37 +300,46 @@ const addxp = async (ctx) => {
 	}
 	add = parseInt(add);
 	
-	const db = await Database.open('./moba.db');
+	const client = new Client({
+		connectionString: process.env.DATABASE_URL,
+		ssl: {
+			rejectUnauthorized: false
+		}
+	});
+	
+	await client.connect();
 	
 	try {
 		let sql = `SELECT experiences.* FROM experiences 
 INNER JOIN users ON experiences.user_id = users.id
-WHERE users.username=?`;
+WHERE users.username=$1`;
 			
-		const user = await db.get(sql, [username]);
+		let user = await client.query(sql, [username]);
+		user = user.rows[0];
 		
 		if (!user) {
 			throw new Error('No existente');
 		}
 		
-		sql = `UPDATE experiences SET points=points+? 
-WHERE user_id=?`;
+		sql = `UPDATE experiences SET points=points+$1 
+WHERE user_id=$2`;
 			
-		const res = await db.run(sql, [add,user.user_id]);
+		const res = await client.query(sql, [add,user.user_id]);
 		
 		user.points += add;
 		
 		sql = `SELECT * FROM config WHERE id=1`;
 			
-		const config = await db.get(sql);
+		let config = await client.query(sql);
+		config = config.rows[0];
 		
 		// NOTA(RECKER): Aumentar nivel
 		let levels = calculate_level_up(user.points,config.xp_need);
 		sql = `UPDATE experiences
 		SET level=${levels}
-		WHERE user_id=?`;
+		WHERE user_id=$1`;
 		
-		await db.run(sql,[user.user_id]);
+		await client.query(sql,[user.user_id]);
 		
 		let response = await ctx.replyWithMarkdown('¡Experiencia agregada!');
 		setTimeout(() => {
@@ -268,6 +352,8 @@ WHERE user_id=?`;
 			ctx.deleteMessage(response.message_id);
 		}, 2000);
 	}
+	
+	await client.end();
 }
 
 const removexp = async (ctx) => {
@@ -289,37 +375,46 @@ const removexp = async (ctx) => {
 	}
 	remove = parseInt(remove);
 	
-	const db = await Database.open('./moba.db');
+	const client = new Client({
+		connectionString: process.env.DATABASE_URL,
+		ssl: {
+			rejectUnauthorized: false
+		}
+	});
+	
+	await client.connect();
 	
 	try {
 		let sql = `SELECT experiences.* FROM experiences 
 INNER JOIN users ON experiences.user_id = users.id
-WHERE users.username=?`;
+WHERE users.username=$1`;
 			
-		const user = await db.get(sql, [username]);
+		let user = await client.query(sql, [username]);
+		user = user.rows[0];
 		
 		if (!user) {
 			throw new Error('No existente');
 		}
 		
-		sql = `UPDATE experiences SET points=CASE WHEN points > ? THEN points - ? ELSE 0 END
-WHERE user_id=?`;
+		sql = `UPDATE experiences SET points=CASE WHEN points > $1 THEN points - $1 ELSE 0 END
+WHERE user_id=$2`;
 			
-		const res = await db.run(sql, [remove,remove,user.user_id]);
+		const res = await client.query(sql, [remove,user.user_id]);
 		
 		user.points -= remove;
 		
 		sql = `SELECT * FROM config WHERE id=1`;
 			
-		const config = await db.get(sql);
+		let config = await client.query(sql);
+		config = config.rows[0];
 		
 		// NOTA(RECKER): Quitar nivel
 		let levels = calculate_level_down(user.points, user.level, config.xp_need);
 		sql = `UPDATE experiences
 		SET level=${levels}
-		WHERE user_id=?`;
+		WHERE user_id=$1`;
 
-		await db.run(sql,[user.user_id]);
+		await client.query(sql,[user.user_id]);
 		
 		let response = await ctx.replyWithMarkdown('¡Experiencia removida!');
 		setTimeout(() => {
@@ -332,6 +427,8 @@ WHERE user_id=?`;
 			ctx.deleteMessage(response.message_id);
 		}, 2000);
 	}
+	
+	await client.end();
 }
 
 module.exports = {

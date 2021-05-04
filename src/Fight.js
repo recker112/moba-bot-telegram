@@ -1,4 +1,5 @@
-const Database = require('sqlite-async');
+// NOTA(RECKER): Conectarse a la DB
+const { Client } = require('pg');
 
 function getRandomInt(min, max) {
   return Math.round(Math.random() * (max - min)) + min;
@@ -35,51 +36,67 @@ const pelea = async (ctx) => {
 		return null;
 	}
 	
-	const db = await Database.open('./moba.db');
+	const client = new Client({
+		connectionString: process.env.DATABASE_URL,
+		ssl: {
+			rejectUnauthorized: false
+		}
+	});
+	
+	await client.connect();
+	
 	let sql = 'SELECT * FROM config WHERE id=1';
 	
-	const config = await db.get(sql);
+	let config = await client.query(sql);
+	config = config.rows[0];
 	
 	// NOTA(RECKER): Obtener golpes_type
-	sql = 'SELECT golpe FROM fight_golpes WHERE 1';
+	sql = 'SELECT golpe FROM fight_golpes';
 	
-	const golpes_type = await db.all(sql);
+	let golpes_type = await client.query(sql);
+	golpes_type = golpes_type.rows;
 	
 	if (!golpes_type.length) {
 		let response = await ctx.replyWithMarkdown('No hay golpes registrados para poder iniciar una batalla');
 		setTimeout(() => {
 			ctx.deleteMessage(response.message_id);
 		}, 5000);
+		
+		await client.end();
 		return null;
 	}
 	
 	// NOTA(RECKER): Obtener jugador 1
 	sql = `SELECT users.*, experiences.* FROM users
 INNER JOIN experiences ON users.id = experiences.user_id
-WHERE users.id=?`;
+WHERE users.id=$1`;
 	
-	const user1 = await db.get(sql, [ctx.from.id]);
+	const user1 = await client.query(sql, [ctx.from.id]);
 	
 	if (!user1) {
 		let response = await ctx.replyWithMarkdown('Debes de registrarte primero\nUsa /help para más información');
 		setTimeout(() => {
 			ctx.deleteMessage(response.message_id);
 		}, 5000);
+		
+		await client.end();
 		return null;
 	}
 	
 	// NOTA(RECKER): Obtener jugador 2
 	sql = `SELECT users.*, experiences.* FROM users
 INNER JOIN experiences ON users.id = experiences.user_id
-WHERE users.username=?`;
+WHERE users.username=$1`;
 	
-	const user2 = await db.get(sql, [username.slice(1)]);
+	const user2 = await client.query(sql, [username.slice(1)]);
 	
 	if (!user2) {
 		let response = await ctx.replyWithMarkdown('El usuario que está retando no se encuentra registrado');
 		setTimeout(() => {
 			ctx.deleteMessage(response.message_id);
 		}, 5000);
+		
+		await client.end();
 		return null;
 	}
 	
@@ -152,34 +169,36 @@ WHERE users.username=?`;
 	ctx.replyWithMarkdown(fight_log);
 	
 	// NOTA(RECKER): Registrar batalla
-	sql = `INSERT INTO fights (user_win,user_lose) VALUES (?,?)`;
+	sql = `INSERT INTO fights (user_win,user_lose) VALUES ($1,$2)`;
 	
-	await db.run(sql, [user_win.user_id,user_lose.user_id]);
+	await client.query(sql, [user_win.user_id,user_lose.user_id]);
 	
 	// NOTA(RECKER): Agregar xp al winner
 	user_win.points += 3;
 	sql = `UPDATE experiences
 		SET points=points+5, aggressiveness=CASE WHEN aggressiveness > 10 THEN aggressiveness - 10 ELSE 0 END, pateria=pateria+20
-		WHERE user_id=?`;
+		WHERE user_id=$1`;
 	
-	await db.run(sql, [user_win.user_id]);
+	await client.query(sql, [user_win.user_id]);
 	
 	// NOTA(RECKER): Agregar agresividad al perdedor
 	sql = `UPDATE experiences
 		SET aggressiveness=aggressiveness+20
-		WHERE user_id=?`;
+		WHERE user_id=$1`;
 	
-	await db.run(sql, [user_lose.user_id]);
+	await client.query(sql, [user_lose.user_id]);
 	
 	// NOTA(RECKER): Aumentar nivel
 	if (user_win.points >= (user_win.level * config.xp_need)) {
 		user_win.level++;
 		sql = `UPDATE experiences
 		SET level=${user_win.level}
-		WHERE user_id=?`;
+		WHERE user_id=$1`;
 		
-		await db.run(sql,[user_win.user_id]);
+		await client.query(sql,[user_win.user_id]);
 	}
+	
+	await client.end();
 }
 
 module.exports = {

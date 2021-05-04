@@ -1,46 +1,54 @@
 // NOTA(RECKER): Conectarse a la DB
-const Database = require('sqlite-async');
+const { Client } = require('pg');
 
 const start_db = async () => {
-	console.log('Iniciando DB...');
-	const db = await Database.open("./moba.db");
+	const client = new Client({
+		connectionString: process.env.DATABASE_URL,
+		ssl: {
+			rejectUnauthorized: false
+		}
+	});
+	
+	await client.connect();
+	
+	console.log('Instalando db...');
 	
 	// NOTA(RECKER): Tabla Users
 	let sql = `CREATE TABLE IF NOT EXISTS users (
-		id BIGINTEGER NOT NULL UNIQUE,
+		id INT NOT NULL UNIQUE,
 		username VARCHAR(50) NOT NULL
 	);`
 	
-	await db.run(sql);
+	await client.query(sql);
 	
 	// NOTA(RECKER): Tabla experiences
 	sql = `CREATE TABLE IF NOT EXISTS experiences (
-		id INTEGER PRIMARY KEY,
-		user_id BIGINTEGER,
-		points BIGINTEGER NOT NULL DEFAULT 0,
-		level BIGINTEGER NOT NULL DEFAULT 1,
-		insults BIGINTEGER NOT NULL DEFAULT 0,
+		id SERIAL,
+		user_id INT,
+		points INT NOT NULL DEFAULT 0,
+		level INT NOT NULL DEFAULT 1,
+		insults INT NOT NULL DEFAULT 0,
 		aggressiveness FLOAT NOT NULL DEFAULT 0,
 		pateria FLOAT NOT NULL DEFAULT 0
 	);`
 	
-	await db.run(sql);
+	await client.query(sql);
 	
 	// NOTA(RECKER): Tabla config
 	sql = `CREATE TABLE IF NOT EXISTS config (
-		id INTEGER PRIMARY KEY,
-		double_exp BOOLEAN DEFAULT 0,
+		id SERIAL,
+		double_exp BOOLEAN DEFAULT FALSE,
 		points_base FLOAT DEFAULT 1,
 		vida_base FLOAT DEFAULT 20,
 		damage_base FLOAT DEFAULT 5,
 		xp_need INTEGER DEFAULT 75
 	);`
 	
-	await db.run(sql);
+	await client.query(sql);
 	
-	sql = "INSERT INTO config (double_exp) VALUES (0)";
+	sql = "INSERT INTO config (double_exp) VALUES (FALSE)";
 	
-	await db.run(sql);
+	await client.query(sql);
 	
 	// NOTA(RECKER): Tabla words
 	sql = `CREATE TABLE IF NOT EXISTS words (
@@ -48,25 +56,27 @@ const start_db = async () => {
 		status INTEGER NOT NULL DEFAULT 1
 	);`
 	
-	await db.run(sql);
+	await client.query(sql);
 	
 	// NOTA(RECKER): Tabla fights
 	sql = `CREATE TABLE IF NOT EXISTS fights (
-		id INTEGER PRIMARY KEY,
-		user_win BIGINTEGER NOT NULL,
-		user_lose BIGINTEGER NOT NULL
+		id SERIAL,
+		user_win INT NOT NULL,
+		user_lose INT NOT NULL
 	);`
 	
-	await db.run(sql);
+	await client.query(sql);
 	
 	// NOTA(RECKER): Tabla fights
 	sql = `CREATE TABLE IF NOT EXISTS fight_golpes (
-		id INTEGER PRIMARY KEY,
-		golpe STRING NOT NULL
+		id SERIAL,
+		golpe VARCHAR(255) NOT NULL
 	);`
 	
-	await db.run(sql);
-	console.log('DB iniciada!');
+	await client.query(sql);
+	
+	await client.end();
+	console.log('DB instalada!');
 }
 
 start_db();
