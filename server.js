@@ -5,6 +5,7 @@ require('./bot.js');
 
 app.get('/', (req, res) => {
 	res.send('SERVIDOR PA!');
+	console.log(process.env.DATABASE_URL);
 })
 
 app.listen(port, () => {
