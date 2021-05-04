@@ -1,0 +1,11 @@
+---
+application:
+  name: "moba-bot-telegram"
+  project: "moba-rank-bot"
+  organization: "QoveryCommunity"
+routers:
+- name: "main-moba-bot-telegram"
+  routes:
+  - application_name: "moba-bot-telegram"
+    paths:
+    - "/*"
