@@ -11,6 +11,7 @@ const pelea = async (ctx) => {
 		let response = await ctx.replyWithMarkdown('Debe de mencionar a un usuario\nEJ: /pelea @usuario');
 		setTimeout(() => {
 			ctx.deleteMessage(response.message_id);
+			ctx.deleteMessage(ctx.message_id);
 		}, 5000);
 		return null;
 	}
@@ -19,6 +20,7 @@ const pelea = async (ctx) => {
 		let response = await ctx.replyWithMarkdown('Debe de mencionar a un usuario\nEJ: /pelea @usuario');
 		setTimeout(() => {
 			ctx.deleteMessage(response.message_id);
+			ctx.deleteMessage(ctx.message_id);
 		}, 5000);
 		return null;
 	}
@@ -32,6 +34,7 @@ const pelea = async (ctx) => {
 		let response = await ctx.replyWithMarkdown('No puedes pelear contra ese oponente');
 		setTimeout(() => {
 			ctx.deleteMessage(response.message_id);
+			ctx.deleteMessage(ctx.message_id);
 		}, 5000);
 		return null;
 	}
@@ -60,6 +63,7 @@ const pelea = async (ctx) => {
 		let response = await ctx.replyWithMarkdown('No hay golpes registrados para poder iniciar una batalla');
 		setTimeout(() => {
 			ctx.deleteMessage(response.message_id);
+			ctx.deleteMessage(ctx.message_id);
 		}, 5000);
 		
 		await client.end();
@@ -78,6 +82,7 @@ WHERE users.id=$1`;
 		let response = await ctx.replyWithMarkdown('Debes de registrarte primero\nUsa /help para más información');
 		setTimeout(() => {
 			ctx.deleteMessage(response.message_id);
+			ctx.deleteMessage(ctx.message_id);
 		}, 5000);
 		
 		await client.end();
@@ -96,6 +101,7 @@ WHERE users.username=$1`;
 		let response = await ctx.replyWithMarkdown('El usuario que está retando no se encuentra registrado');
 		setTimeout(() => {
 			ctx.deleteMessage(response.message_id);
+			ctx.deleteMessage(ctx.message_id);
 		}, 5000);
 		
 		await client.end();
@@ -199,6 +205,10 @@ WHERE users.username=$1`;
 		
 		await client.query(sql,[user_win.user_id]);
 	}
+	
+	setTimeout(() => {
+		ctx.deleteMessage(ctx.message_id);
+	}, 5000);
 	
 	await client.end();
 }

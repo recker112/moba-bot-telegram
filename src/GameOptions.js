@@ -67,6 +67,7 @@ const top = async (ctx) => {
 	let response = await ctx.replyWithMarkdown(text);
 	setTimeout(() => {
 		ctx.deleteMessage(response.message_id);
+		ctx.deleteMessage(ctx.message_id);
 	}, 20000);
 	
 	await client.end();
@@ -100,6 +101,7 @@ const c_prendio = async (ctx, double) => {
 		ctx.replyWithMarkdown('*Se acabó lo que se daba.*\nAhora hay un x1 en la EXP.');
 	}
 	
+	ctx.deleteMessage(ctx.message_id);
 	await client.end();
 }
 
