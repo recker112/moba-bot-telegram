@@ -70,7 +70,7 @@ const start_db = async () => {
 	// NOTA(RECKER): Tabla fights
 	sql = `CREATE TABLE IF NOT EXISTS fight_golpes (
 		id SERIAL,
-		golpe VARCHAR(255) NOT NULL
+		golpe VARCHAR(255) UNIQUE NOT NULL
 	);`
 	
 	await client.query(sql);
