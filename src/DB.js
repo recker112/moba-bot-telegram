@@ -18,6 +18,7 @@ const start_db = async () => {
 		id INTEGER PRIMARY KEY,
 		user_id BIGINTEGER,
 		points BIGINTEGER NOT NULL DEFAULT 0,
+		level BIGINTEGER NOT NULL DEFAULT 1,
 		insults BIGINTEGER NOT NULL DEFAULT 0,
 		aggressiveness FLOAT NOT NULL DEFAULT 0,
 		pateria FLOAT NOT NULL DEFAULT 0
@@ -28,7 +29,11 @@ const start_db = async () => {
 	// NOTA(RECKER): Tabla config
 	sql = `CREATE TABLE IF NOT EXISTS config (
 		id INTEGER PRIMARY KEY,
-		double_exp BOOLEAN DEFAULT 0
+		double_exp BOOLEAN DEFAULT 0,
+		points_base FLOAT DEFAULT 1,
+		vida_base FLOAT DEFAULT 20,
+		damage_base FLOAT DEFAULT 5,
+		xp_need INTEGER DEFAULT 75
 	);`
 	
 	await db.run(sql);
@@ -41,6 +46,23 @@ const start_db = async () => {
 	sql = `CREATE TABLE IF NOT EXISTS words (
 		word VARCHAR(50) NOT NULL UNIQUE,
 		status INTEGER NOT NULL DEFAULT 1
+	);`
+	
+	await db.run(sql);
+	
+	// NOTA(RECKER): Tabla fights
+	sql = `CREATE TABLE IF NOT EXISTS fights (
+		id INTEGER PRIMARY KEY,
+		user_win BIGINTEGER NOT NULL,
+		user_lose BIGINTEGER NOT NULL
+	);`
+	
+	await db.run(sql);
+	
+	// NOTA(RECKER): Tabla fights
+	sql = `CREATE TABLE IF NOT EXISTS fight_golpes (
+		id INTEGER PRIMARY KEY,
+		golpe STRING NOT NULL
 	);`
 	
 	await db.run(sql);

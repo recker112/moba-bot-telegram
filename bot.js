@@ -4,6 +4,7 @@ const accountOptions = require('./src/AccountOptions');
 const settings = require('./src/Settings');
 const gameOptions = require('./src/GameOptions');
 const gameCore = require('./src/GameCore');
+const fight = require('./src/Fight');
 
 // NOTA(RECKER): Iniciar variables
 const dotenv = require('dotenv');
@@ -21,8 +22,6 @@ const bot = new Telegraf(process.env.BOT_TOKEN);
 
 // NOTA(RECKER): Configuraciones de puntos
 const double = 4;
-const vida = 20;
-const damage = 5;
 
 bot.telegram.getMe().then((botInfo) => {
 	bot.options.username = botInfo.username
@@ -57,7 +56,7 @@ bot.command('cuenta', async ctx => {
 
 // NOTA(RECKER): Pelea
 bot.command('pelea', async (ctx) => {
-	gameOptions.pelea(ctx);
+	fight.pelea(ctx);
 });
 
 // NOTA(RECKER): Ver stats
@@ -66,12 +65,12 @@ bot.command('stats', async ctx => {
 	/*if (ctx.chat.type !== 'private') {
 		return null;
 	}*/
-	accountOptions.stats(ctx, vida, damage);
+	accountOptions.stats(ctx);
 });
 
 // NOTA(RECKER): Top
 bot.command('top', async ctx => {
-	gameOptions.top(ctx, vida, damage);
+	gameOptions.top(ctx);
 });
 
 // NOTA(RECKER): Agregar palabras lite
@@ -103,12 +102,45 @@ bot.command('removeword', async ctx => {
 	settings.removeword(ctx);
 });
 
-// NOTA(RECKER): CORE POINTS
-bot.on('message', async ctx => {
-	// NOTA(RECKER): No contar puntos si no es el grupo definido
-	if (ctx.chat.id !== -1001200393360) {
+// NOTA(RECKER): Agregar golpe
+bot.command('addgolpe', async ctx => {
+	if (ctx.from.id !== 1281463312) {
 		return null;
 	}
+	settings.addgolpe(ctx);
+});
+
+// NOTA(RECKER): Listar golpess
+bot.command('golpelist', async ctx => {
+	settings.golpelist(ctx);
+});
+
+// NOTA(RECKER): Eliminar golpes
+bot.command('removegolpe', async ctx => {
+	if (ctx.from.id !== 1281463312) {
+		return null;
+	}
+	settings.removegolpe(ctx);
+});
+
+// NOTA(RECKER): Añadir xp
+bot.command('addxp', async ctx => {
+	if (ctx.from.id !== 1281463312) {
+		return null;
+	}
+	settings.addxp(ctx);
+});
+
+// NOTA(RECKER): Quitar xp
+bot.command('removexp', async ctx => {
+	if (ctx.from.id !== 1281463312) {
+		return null;
+	}
+	settings.removexp(ctx);
+});
+
+// NOTA(RECKER): CORE POINTS
+bot.on('message', async ctx => {
 	gameCore.main(ctx, double);
 });
 

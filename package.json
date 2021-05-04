@@ -4,10 +4,10 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "pm2 start index.js",
-    "bot": "node index.js",
-    "deployment": "pm2 start index.js",
-    "dev": "nodemon index.js"
+    "start": "node server.js",
+    "bot": "node bot.js",
+    "deployment": "pm2 start bot.js",
+    "dev": "nodemon bot.js"
   },
   "repository": {
     "type": "git",

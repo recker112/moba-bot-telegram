@@ -25,34 +25,55 @@ const cuenta = (ctx) => {
 	ctx.replyWithMarkdown('MENU PARA ACTUALIZAR CUENTA');
 }
 
-const stats = async (ctx, vida, damage) => {
+const stats = async (ctx) => {
 	const db = await Database.open('./moba.db');
-	let sql = `SELECT * FROM experiences WHERE user_id=?`;
-
-	const user = await db.get(sql,[ctx.from.id]);
+	let sql = 'SELECT * FROM config WHERE id=1';
 	
-	if (!user) {
+	// NOTA(RECKER): Obtener datos necesarios
+	const config = await db.get(sql);
+	
+	sql = `SELECT * FROM experiences WHERE user_id=?`;
+
+	const experiences = await db.get(sql,[ctx.from.id]);
+	
+	if (!experiences) {
 		return null;
 	}
 	
-	const nivel = Math.floor(user.points * 0.01) + 1;
-	const restante_nivel = Math.floor(user.points * 0.01);
-	const aggressiveness = Math.round10(user.aggressiveness, -2);
-	const pato = Math.round10(user.pateria, -2);
+	// NOTA(RECKER): Obtener batallas
+	sql = `SELECT count(user_win) as count FROM fights WHERE user_win=?`;
+	const wins = await db.get(sql,[ctx.from.id]);
+	sql = `SELECT count(user_lose) as count FROM fights WHERE user_lose=?`;
+	const loses = await db.get(sql,[ctx.from.id]);
 	
-	const damage_base = damage * nivel;
-	const vida_base = vida * nivel;
+	// NOTA(RECKER): Calculos
+	const aggressiveness = Math.round10(experiences.aggressiveness, -2);
+	const pato = Math.round10(experiences.pateria, -2);
+	
+	const damage_base = config.damage_base * experiences.level;
+	const vida_base = config.vida_base * experiences.level;
+	let damage = damage_base + ((damage_base * aggressiveness) / 100);
+	damage = damage > 0 ? Math.round10(damage, -2) : 0;
+	let vida = vida_base - ((vida_base * pato) / 100);
+	vida = vida > 0 ? Math.round10(vida, -2) : 0;
+	
+	const xp_acumulada = config.xp_need - ((experiences.level * config.xp_need) - experiences.points);
+	const porcentaje_alcandado = Math.round((100 * xp_acumulada) / config.xp_need);
 
 	let text = `_Ficha de ${ctx.from.first_name} ${ctx.from.last_name}:_
-_Daño: ${damage_base + ((damage_base * aggressiveness) / 100)}_
-_Vida: ${vida_base - ((vida_base * pato) / 100)}_
-_EXP: ${user.points} pts_
-_Nivel: ${nivel}_
-_Insultos: ${user.insults}_
+_Nivel: ${experiences.level} (${porcentaje_alcandado}%)_
+_EXP: ${experiences.points} pts_
+_Daño: ${damage}_
+_Vida: ${vida}_
+_Insultos: ${experiences.insults}_
 
 *ESTADOS*
 _Agresividad: ${aggressiveness}%_
-_Cariñosidad: ${pato}%_`;
+_Cariñosidad: ${pato}%_
+
+*BATALLAS*
+_Ganadas: ${wins.count}_
+_Perdidas: ${loses.count}_`;
 
 	let response = await ctx.replyWithMarkdown(text);
 	setTimeout(() => {
