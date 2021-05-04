@@ -3,9 +3,9 @@ const { Client } = require('pg');
 
 const main = async (ctx, double) => {
 	// NOTA(RECKER): No contar puntos si no es el grupo definido
-	/*if (ctx.chat.id !== -1001200393360) {
+	if (ctx.chat.id !== -1001200393360) {
 		return null;
-	}*/
+	}
 
 	const client = new Client({
 		connectionString: process.env.DATABASE_URL,
