@@ -71,7 +71,8 @@ const pelea = async (ctx) => {
 INNER JOIN experiences ON users.id = experiences.user_id
 WHERE users.id=$1`;
 	
-	const user1 = await client.query(sql, [ctx.from.id]);
+	let user1 = await client.query(sql, [ctx.from.id]);
+	user1 = user1.rows[0];
 	
 	if (!user1) {
 		let response = await ctx.replyWithMarkdown('Debes de registrarte primero\nUsa /help para más información');
@@ -88,7 +89,8 @@ WHERE users.id=$1`;
 INNER JOIN experiences ON users.id = experiences.user_id
 WHERE users.username=$1`;
 	
-	const user2 = await client.query(sql, [username.slice(1)]);
+	let user2 = await client.query(sql, [username.slice(1)]);
+	user2 = user2.rows[0];
 	
 	if (!user2) {
 		let response = await ctx.replyWithMarkdown('El usuario que está retando no se encuentra registrado');
