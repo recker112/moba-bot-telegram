@@ -6,7 +6,6 @@
   "scripts": {
     "start": "node server.js",
     "bot": "node bot.js",
-    "deployment": "pm2 start bot.js",
     "dev": "nodemon bot.js"
   },
   "repository": {
@@ -22,10 +21,8 @@
   "dependencies": {
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
-    "pm2": "^4.5.6",
     "sqlite-async": "^1.1.1",
-    "telegraf": "^4.3.0",
-    "telegraf-session-local": "^2.1.0"
+    "telegraf": "^4.3.0"
   },
   "devDependencies": {
     "nodemon": "^2.0.7"

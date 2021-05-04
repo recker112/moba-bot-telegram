@@ -6,7 +6,7 @@ const addword_soft = async (ctx) => {
 	let word = ctx.message.text.slice(ctx.message.entities[0].length + 1);
 	
 	if (!word.length) {
-		ctx.replyWithMarkdown('Debe de colocar una palabra');
+		ctx.replyWithMarkdown('Debe de colocar una palabra\nEJ: /addword_soft');
 		return null;
 	}
 	
@@ -34,7 +34,7 @@ const addword = async (ctx) => {
 	let word = ctx.message.text.slice(ctx.message.entities[0].length + 1);
 	
 	if (!word.length) {
-		ctx.replyWithMarkdown('Debe de colocar una palabra');
+		ctx.replyWithMarkdown('Debe de colocar una palabra\nEJ: /addword palabra');
 		return null;
 	}
 	
@@ -79,7 +79,7 @@ ${wordsList}`);
 const removeword = async (ctx) => {
 	let word = ctx.message.text.slice(ctx.message.entities[0].length + 1);
 	if (!word.length) {
-		ctx.replyWithMarkdown('Debe de colocar una palabra');
+		ctx.replyWithMarkdown('Debe de colocar una palabra\nEJ: /removeword palabra');
 		return null;
 	}
 	
@@ -107,7 +107,7 @@ const addgolpe = async (ctx) => {
 	let golpe = ctx.message.text.slice(ctx.message.entities[0].length + 1);
 	
 	if (!golpe.length) {
-		ctx.replyWithMarkdown('Debe de colocar una palabra');
+		ctx.replyWithMarkdown('Debe de colocar una palabra\nEJ: /addgolpe palabra');
 		return null;
 	}
 	
@@ -152,7 +152,7 @@ ${golpeList}`);
 const removegolpe = async (ctx) => {
 	let golpe = ctx.message.text.slice(ctx.message.entities[0].length + 1);
 	if (!golpe.length) {
-		ctx.replyWithMarkdown('Debe de colocar una palabra');
+		ctx.replyWithMarkdown('Debe de colocar una palabra\nEJ: /removegolpe palabra');
 		return null;
 	}
 	

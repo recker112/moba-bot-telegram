@@ -20,8 +20,25 @@ const registrar = async (ctx) => {
 	ctx.reply(`@${ctx.from.username} se unió al campo de batalla`);
 }
 
-const cuenta = (ctx) => {
-	console.log(ctx);
+const cuenta = async (ctx) => {
+	const db = await Database.open('./moba.db');
+
+	let sql = 'SELECT * FROM users where id=?';
+
+	const user = await db.get(sql,[ctx.from.id]);
+	
+	// NOTA(RECKER): Evitar el registro
+	if (!user) {
+		let response = await ctx.reply('No estás registrado aún');
+		setTimeout(() => {
+			ctx.deleteMessage(response.message_id);
+		}, 5000);
+		return null;
+	}
+	
+	const count = await ctx.answerCbQuery();
+	console.log(count);
+	
 	ctx.replyWithMarkdown('MENU PARA ACTUALIZAR CUENTA');
 }
 

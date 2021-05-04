@@ -3,7 +3,7 @@ const start = (ctx) => {
 }
 
 const help = (ctx) => {
-	ctx.replyWithMarkdown(`|------- *MOBA RANK parche 2021.5.1* -------|
+	ctx.replyWithMarkdown(`|-------------- *MOBA RANK* --------------|
 Puedes usar los siguientes comandos para interactuar con el sistema:
 /registrar - Crea una cuenta para unirte a la batalla
 /status - Ve tus puntajes, daño y demás
@@ -13,23 +13,23 @@ Puedes usar los siguientes comandos para interactuar con el sistema:
 /golpelist - Ver lista de todos los goles disponibles
 
 *¿CÓMO JUGAR?*
-Simplemente escribe un mensaje y ya estarás jugando. La *Agresividad* sube cuando usas alguna de las palabras registradas como _AGRESIVAS_, lo mismo para con la *CARIÑOSIDAD*.
+Simplemente escribe un mensaje y ya estarás jugando. La *Agresividad* sube cuando usas alguna de las palabras registradas como _AGRESIVAS_, lo mismo para con la *CARIÑOSIDAD*. Al utilizar estas palabras recibiras un x2 de puntos.
 
-También si mencionas a otra persona @usuaro o simplemente respondes un comentario con alguna de estas dos palabras, los puntos se duplican y sus efectos serán aplicados.
+También si mencionas a otra persona @usuaro o simplemente respondes un comentario con alguna de estas dos tipos de palabras, sus efectos serán aplicados.
 
-Si tienes curiosidad puedes ver el código (aquí)[https://https://github.com/recker112/moba-bot-telegram]`);
+Si tienes curiosidad puedes ver el código [aquí](https://github.com/recker112/moba-bot-telegram)`);
 }
 
 const settings = (ctx) => {
-	ctx.reply(`|------- *MOBA RANK CONFIG parche 2021.5.1* -------|
+	ctx.replyWithMarkdown(`|-------------- *MOBA RANK CONFIG* --------------|
 Puedes usar los siguientes comandos para configurar el sistema:
-/addword_soft - Aregar una palabra cariñosa a la lista (EJ: /addword_soft word)
-/addword - Aregar una palabra agresiva a la lista (EJ: /addword word)
-/removeword - Eliminar una palabra de la lista (EJ: /removeword word)
-/addgolpe - Agrega un golpe a la lista (EJ: /addgolpe word)
-/removegolpe - Elimina un golpe de la lista (EJ: /removegolpe word)
-/addxp - Agregar xp a un usuario (EJ: /addxp @usuario cantidad)
-/removexp - Elimina xp a un usuario (EJ: /removexp @usuario cantidad)`);
+/addword_soft - Aregar una palabra cariñosa a la lista
+/addword - Aregar una palabra agresiva a la lista
+/removeword - Eliminar una palabra de la lista
+/addgolpe - Agrega un golpe a la lista
+/removegolpe - Elimina un golpe de la lista
+/addxp - Agregar xp a un usuario
+/removexp - Elimina xp a un usuario`);
 }
 
 module.exports = {

@@ -16,7 +16,7 @@ const Database = require('sqlite-async');
 
 require('./src/parseCeil');
 
-const { Telegraf } = require('telegraf');
+const { Telegraf, Markup } = require('telegraf');
 
 const bot = new Telegraf(process.env.BOT_TOKEN);
 

@@ -172,7 +172,6 @@ WHERE users.username=?`;
 	await db.run(sql, [user_lose.user_id]);
 	
 	// NOTA(RECKER): Aumentar nivel
-	console.log(user_win.level * config.xp_need);
 	if (user_win.points >= (user_win.level * config.xp_need)) {
 		user_win.level++;
 		sql = `UPDATE experiences
