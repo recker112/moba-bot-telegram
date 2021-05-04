@@ -12,7 +12,6 @@ dotenv.config();
 
 // NOTA(RECKER): DB
 require('./src/DB');
-const Database = require('sqlite-async');
 
 require('./src/parseCeil');
 
