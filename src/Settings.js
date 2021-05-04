@@ -271,7 +271,7 @@ const calculate_level_down = (xp, level_user, xp_need) => {
 	
 	let cancel = true;
 	while(cancel) {
-		if (level > 0 && xp < (level * xp_need)) {
+		if (level > 1 && xp < (level * xp_need)) {
 			level--;
 		}else {
 			cancel=false;
