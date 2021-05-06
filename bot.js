@@ -1,7 +1,20 @@
 // NOTA(RECKER): Importanciones
+const startOptions = require('./src/MainOptions/Start');
+const setupOptions = require('./src/MainOptions/Setup');
+const registrar = require('./src/AccountOptions/Registrar');
+const cuentaOptions = require('./src/AccountOptions/Cuenta');
+const close = require('./src/Close');
+const returns = require('./src/Returns');
+const gameText = require('./src/Core/GameText');
+const gameOthers = require('./src/Core/GameOthers');
+const settings = require('./src/Core/Settings');
+const controlXP = require('./src/Core/ControlXP');
+const controlConfig = require('./src/Core/ControlConfigs');
+
+const resetOptions = require('./src/MainOptions/Reset');
 const mainOptions = require('./src/MainOptions');
 const accountOptions = require('./src/AccountOptions');
-const settings = require('./src/Settings');
+///const settings = require('./src/Settings');
 const gameOptions = require('./src/GameOptions');
 const gameCore = require('./src/GameCore');
 const fight = require('./src/Fight');
@@ -16,32 +29,76 @@ require('./src/DB');
 require('./src/parseCeil');
 
 const { Telegraf, Markup } = require('telegraf');
+const PostgresSession = require('./telegraf-postgres');
+
+// NOTA(RECKER): Conectarse a la DB
+const { Client } = require('pg');
 
 const bot = new Telegraf(process.env.BOT_TOKEN);
 
 // NOTA(RECKER): Configuraciones de puntos
-const double = 4;
 process.env.VERSION = 'v1.0.2';
+bot.use((new PostgresSession({
+	connectionString: process.env.DATABASE_URL,
+		ssl: {
+			rejectUnauthorized: false
+		}
+})).middleware());
 
 bot.telegram.getMe().then((botInfo) => {
 	bot.options.username = botInfo.username
 })
 
-bot.start(ctx => {
-	mainOptions.start(ctx);
-});
+bot.start(startOptions.start);
 
+// NOTA(RECKER): Instalar en un chat
+bot.command('install', setupOptions.install);
+
+// NOTA(RECKER): Confimar instalacion
+bot.action('confirm_install', setupOptions.confirm_install);
+
+// NOTA(RECKER): Reset
+bot.command('reset', resetOptions.reset);
+
+// NOTA(RECKER): Confimar reset
+bot.action('confirm_reset', resetOptions.confirm_reset);
+
+// NOTA(RECKER): Configuraciones
+bot.settings(settings.main);
+
+// NOTA(RECKER): Control XP
+bot.action(['settings_control_xp','settings_control_xp_add', 'settings_control_xp_remove'], controlXP);
+
+// NOTA(RECKER): Control de configuraciones
+bot.action(['settings_config', 'settings_vida_base', 'settings_damage_base', 'settings_smoothness', 'settings_aggressiveness'], controlConfig);
+
+// NOTA(RECKER): Registrar cuenta
+bot.command('registrar', registrar);
+
+// NOTA(RECKER): Administrar cuenta
+bot.command('cuenta', cuentaOptions.cuenta);
+
+// NOTA(RECKER): Confimar instalacion
+bot.action('sync_account', cuentaOptions.sync_account);
+
+// NOTA(RECKER): Regresar
+bot.action('returns', returns);
+
+// NOTA(RECKER): Cerrar mensaje
+bot.action('close', close);
+
+bot.on('text', gameText);
+
+bot.on('message', gameOthers);
+/*
+
+/*
 bot.help(ctx => {
 	mainOptions.help(ctx);
 });
 
 bot.settings(ctx => {
 	mainOptions.settings(ctx);
-});
-
-// NOTA(RECKER): Registrar cuenta
-bot.command('registrar', async ctx => {
-	accountOptions.registrar(ctx);
 });
 
 // NOTA(RECKER): Prender el carro manual
@@ -62,9 +119,9 @@ bot.command('pelea', async (ctx) => {
 // NOTA(RECKER): Ver stats
 bot.command('stats', async ctx => {
 	// NOTA(RECKER): Solo por mensaje privado
-	/*if (ctx.chat.type !== 'private') {
+	if (ctx.chat.type !== 'private') {
 		return null;
-	}*/
+	}
 	accountOptions.stats(ctx);
 });
 
@@ -123,25 +180,10 @@ bot.command('removegolpe', async ctx => {
 	settings.removegolpe(ctx);
 });
 
-// NOTA(RECKER): Añadir xp
-bot.command('addxp', async ctx => {
-	if (ctx.from.id !== 1281463312) {
-		return null;
-	}
-	settings.addxp(ctx);
-});
-
-// NOTA(RECKER): Quitar xp
-bot.command('removexp', async ctx => {
-	if (ctx.from.id !== 1281463312) {
-		return null;
-	}
-	settings.removexp(ctx);
-});
-
 // NOTA(RECKER): CORE POINTS
 bot.on('message', async ctx => {
 	gameCore.main(ctx, double);
 });
+*/
 
 bot.launch();

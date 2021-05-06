@@ -1,6 +1,8 @@
-const start = async (ctx) => {
-	ctx.replyWithMarkdown('Bot moba *privado*');
-}
+// NOTA(RECKER): Conectarse a la DB
+const { Client } = require('pg');
+
+// NOTA(RECKER): DB
+const { start_db, down_db } = require('../src/DB');
 
 const help = async (ctx) => {
 	let response = await ctx.replyWithMarkdown(`|-------------- *MOBA RANK ${process.env.VERSION}* --------------|
@@ -43,7 +45,6 @@ Puedes usar los siguientes comandos para configurar el sistema:
 }
 
 module.exports = {
-	start,
 	help,
 	settings,
 };

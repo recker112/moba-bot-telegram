@@ -152,14 +152,16 @@ WHERE users.username=$1`;
 		user_recived.vida = Math.round10(user_recived.vida, -2);
 		fight_log += `- @${user_attack.username} ${golpes_type[randomNumberText].golpe} @${user_recived.username} dejándolo con ${user_recived.vida}PS\n`;
 		
-		
-		// NOTA(RECKER): Mensajes especiales
-		if ((users[0].vida <= 0 || users[1].vida <= 0) && round === 1) {
-			// NOTA(RECKER): Deleteado
-			fight_log += '\n*DELETEADO PAPÁ*';
-		}
-		
 		round++;
+	}
+	
+	// NOTA(RECKER): Mensajes especiales
+	if ((users[0].vida <= 0 || users[1].vida <= 0) && round === 1) {
+		// NOTA(RECKER): No vida
+		fight_log += '\n*El oponente no tiene vida suficiente para una batalla*';
+	}else if ((users[0].vida <= 0 || users[1].vida <= 0) && round === 2) {
+		// NOTA(RECKER): No vida
+		fight_log += '\n*DELETEADO PAPÁ*';
 	}
 	
 	let user_win;
