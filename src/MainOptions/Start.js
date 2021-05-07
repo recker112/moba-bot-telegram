@@ -20,6 +20,7 @@ const start = async (ctx) => {
 		{ command: '/cuenta', description: 'Maneja diferentes opciones de tu cuenta' },
 		{ command: '/settings', description: 'Configuraciones del sistema' },
 		{ command: '/wordlist', description: 'Lista de palabras disponibles' },
+		{ command: '/stats', description: 'Ve tus stats' },
 	];
 	
 	const client = new Client({

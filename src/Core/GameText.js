@@ -10,6 +10,7 @@ const { smoothness } = require('./settings/Smoothness');
 const { addword1 } = require('./settings/AddWords1');
 const { addword2 } = require('./settings/AddWords2');
 const { removeword } = require('./settings/RemoveWords');
+const { xp_debuff } = require('../AccountOptions/invert_xp/XP');
 
 const awaitResponse = async (ctx) => {
 	const awaitID = ctx.session.awaitID;
@@ -55,6 +56,10 @@ const awaitResponse = async (ctx) => {
 			
 		case 'removeword':
 			await removeword(ctx);
+			break;
+			
+		case 'xp_debuff':
+			await xp_debuff(ctx);
 			break;
 			
 		default:

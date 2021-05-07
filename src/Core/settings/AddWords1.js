@@ -40,7 +40,6 @@ Para cancelar simplemente escriba /cancel.`);
 		}
 		ctx.session.awaitID = length;
 	}
-	
 }
 
 const addword1 = async (ctx) => {

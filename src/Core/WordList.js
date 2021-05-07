@@ -99,6 +99,8 @@ const list_words1 = async (ctx) => {
 	let words = await client.query(sql);
 	words = words.rows;
 	
+	client.end();
+	
 	let wordsList = '';
 	words.map(({ word, status }) => {
 		wordsList = wordsList + `- ${word}\n`;
@@ -142,6 +144,8 @@ const list_words2 = async (ctx) => {
 
 	let words = await client.query(sql);
 	words = words.rows;
+	
+	client.end();
 	
 	let wordsList = '';
 	words.map(({ word, status }) => {

@@ -6,7 +6,7 @@ const { Client } = require('pg');
 // NOTA(RECKER): Botones
 const buttons_init = Markup.inlineKeyboard([
 	[
-		Markup.button.callback('Gastar niveles', 'consume_lvl'),
+		Markup.button.callback('Invertir XP', 'invertxp'),
 		Markup.button.callback('Sincronizar cuenta', 'sync_account')
 	],
 	[Markup.button.callback('Cerrar', 'close')]
@@ -118,6 +118,11 @@ const sync_account = async (ctx) => {
 		reply_markup: buttons.reply_markup
 	});
 	
+	init_state.text = `Bienvenido a tu cuenta ${ctx.from.first_name} ${ctx.from.last_name}
+Aquí podrás hacer diferentes acciones, usa los botones de abajo para elegir una opción.
+
+👇👇👇👇👇👇`;
+	
 	// NOTA(RECKER): Guardar en session
 	let copy = typeof ctx.session.returns !== 'object' ? [] : ctx.session.returns;
 	
@@ -133,4 +138,5 @@ const sync_account = async (ctx) => {
 module.exports = {
 	cuenta,
 	sync_account,
+	init_state,
 }

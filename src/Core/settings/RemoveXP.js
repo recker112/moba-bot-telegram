@@ -1,20 +1,7 @@
 // NOTA(RECKER): Conectarse a la DB
 const { Client } = require('pg');
 
-const calculate_level_down = (xp, level_user, xp_need) => {
-	let level = level_user;
-	
-	let cancel = true;
-	while(cancel) {
-		if (level > 1 && xp < (level * xp_need)) {
-			level--;
-		}else {
-			cancel=false;
-		}
-	}
-	
-	return level;
-}
+const { calculate_level } = require('./AddXP');
 
 const removexp_awaitResponse =  async (ctx) => {
 	let response = await ctx.reply(`Para remover xp a un usuario use el siguiente formato:
@@ -112,10 +99,10 @@ const removexp = async (ctx) => {
 		
 		let user;
 		if (!cancel) {
-			sql = 'SELECT users.id, experiences.points, experiences.level FROM users INNER JOIN experiences ON experiences.user_id = users.id WHERE username=$1';
+			sql = 'SELECT users.id, experiences.points FROM users INNER JOIN experiences ON experiences.user_id = users.id WHERE username=$1';
 		
 			user = await client.query(sql,[params[0].slice(1)]);
-			user = user.rows[0]
+			user = user.rows[0];
 		}
 		
 		if (!cancel && user) {
@@ -126,7 +113,7 @@ const removexp = async (ctx) => {
 			user.points -= params[1];
 
 			// NOTA(RECKER): Quitar nivel
-			let levels = calculate_level_down(user.points, user.level, config.xp_need);
+			let levels = calculate_level(user.points, config.xp_need);
 			sql = 'UPDATE experiences SET level=$1 WHERE user_id=$2';
 			
 			await client.query(sql,[levels,user.id]);

@@ -1,7 +1,7 @@
 // NOTA(RECKER): Conectarse a la DB
 const { Client } = require('pg');
 
-const calculate_level_up = (xp, xp_need) => {
+const calculate_level = (xp, xp_need) => {
 	let level = 1;
 	
 	let cancel = true;
@@ -123,7 +123,7 @@ const addxp = async (ctx) => {
 			user.points += params[1];
 
 			// NOTA(RECKER): Quitar nivel
-			let levels = calculate_level_up(user.points, config.xp_need);
+			let levels = calculate_level(user.points, config.xp_need);
 			sql = 'UPDATE experiences SET level=$1 WHERE user_id=$2';
 			
 			await client.query(sql,[levels,user.id]);
@@ -208,4 +208,5 @@ Si desea cancelar puede usar el comando /cancel.`);
 module.exports = {
 	addxp_awaitResponse,
 	addxp,
+	calculate_level,
 }

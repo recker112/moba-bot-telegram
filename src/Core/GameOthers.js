@@ -40,36 +40,34 @@ WHERE experiences.user_id=$1`;
 	}
 	console.log(experiences, 'ANTES');
 	
-	// NOTA(RECKER): Obtener castigos
-	sql = `SELECT actions.*, users.username FROM actions
-INNER JOIN users ON users.id = actions.user_from
-WHERE user_id=$1 AND expired_at_date > now() :: date AND expired_at_hora > now() :: time`;
+	// NOTA(RECKER): Obtener debuff
+	sql = `SELECT debuffs.*, users.username FROM debuffs
+INNER JOIN users ON users.id = debuffs.user_from
+WHERE user_id=$1 AND expired_at > now() :: timestamp`;
 	
-	let actions = await client.query(sql,[ctx.from.id]);
-	actions = actions.rows;
+	let debuffs = await client.query(sql,[ctx.from.id]);
+	debuffs = debuffs.rows;
 	
-	let delete_menssage = 0;
-	let delete_menssage_random = 0;
-	let xp_debuff_action = 0;
-	let smoothness_debuff_action = 0;
-	let aggressiveness_debuff_action = 0;
-	let delete_from = '';
-	actions && actions.map((action) => {
-		if (action.delete_message > 0 && !delete_from) {
-			delete_menssage++;
-			delete_from = {
-				id: action.user_from,
-				username: action.username
-			};
-		}else if (action.delete_message_random > 0 && !delete_from) {
-			delete_menssage_random++;
-			delete_from = {
-				id: action.user_from,
-				username: action.username
-			};
-		}else if (action.xp_debuff > 0 && (xp_debuff_action+action.xp_debuff) < 75) {
-			xp_debuff_action += action.xp_debuff
-		}
+	// NOTA(RECKER): Acumular debuff
+	let stats = {
+		xp_debuff: 0,
+		vida_debuff: 0,
+		damage_debuff: 0,
+		delete_message: 0,
+		delete_message_random: 0,
+		user_from: {},
+	};
+
+	debuffs.map((debuff) => {
+		let keys = Object.keys(stats);
+		keys.map((key) => {
+			if (debuff.type === key) {
+				stats[key] += debuff.amount;
+				
+				// NOTA(RECKER): Obtener el username_from
+				stats.user_from[key] = !stats.user_from[key] ? debuff.username : stats.user_from[key];
+			}
+		});
 	});
 	
 	// NOTA(RECKER): Dar puntos

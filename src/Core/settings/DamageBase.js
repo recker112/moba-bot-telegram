@@ -67,11 +67,6 @@ const damage_base = async (ctx) => {
 	
 	await client.connect();
 	
-	let sql = `SELECT * FROM configs WHERE id=1`;
-			
-	let config = await client.query(sql);
-	config = config.rows[0];
-	
 	// NOTA(RECKER): Variables
 	let number = ctx.message.text;
 	number = number.split('\n');

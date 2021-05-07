@@ -44,20 +44,14 @@ const start_db = async () => {
 	await client.query(sql);
 	
 	// NOTA(RECKER): Tabla punishments
-	sql = `CREATE TABLE IF NOT EXISTS actions (
+	sql = `CREATE TABLE IF NOT EXISTS debuffs (
 		id SERIAL,
-		user_id INT UNIQUE,
+		user_id INT,
 		user_from INT,
-		xp_debuff FLOAT NOT NULL DEFAULT 0,
-		vida_debuff FLOAT NOT NULL DEFAULT 0,
-		damage_debuff FLOAT NOT NULL DEFAULT 0,
-		smoothness_debuff FLOAT NOT NULL DEFAULT 0,
-		aggressiveness_debuff FLOAT NOT NULL DEFAULT 0,
-		delete_message INT NOT NULL DEFAULT 0,
-		delete_message_random INT NOT NULL DEFAULT 0,
-		remember TEXT NOT NULL DEFAULT 0,
-		expired_at_date date NOT NULL,
-		expired_at_hora time NOT NULL
+		type VARCHAR(30) NOT NULL,
+		amount INT NOT NULL,
+		xp_amount FLOAT NOT NULL,
+		expired_at timestamp NOT NULL
 	);`
 	
 	await client.query(sql);
@@ -174,7 +168,7 @@ const down_db = async () => {
 	console.log('Reiniciando db...');
 	
 	// NOTA(RECKER): Tabla experiences
-	let sql = 'DROP TABLE IF EXISTS experiences, effects, actions, parche_niveling, fights, postgress_sessions';
+	let sql = 'DROP TABLE IF EXISTS experiences, effects, debuffs, parche_niveling, fights, postgress_sessions';
 	
 	await client.query(sql);
 	

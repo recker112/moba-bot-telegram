@@ -12,6 +12,8 @@ const controlXP = require('./src/Core/ControlXP');
 const controlConfig = require('./src/Core/ControlConfigs');
 const controlWords = require('./src/Core/ControlWords');
 const wordList = require('./src/Core/WordList');
+const stats = require('./src/AccountOptions/Stats');
+const invertXP = require('./src/AccountOptions/InvertXP');
 
 const resetOptions = require('./src/MainOptions/Reset');
 const mainOptions = require('./src/MainOptions');
@@ -91,6 +93,15 @@ bot.command('cuenta', cuentaOptions.cuenta);
 
 // NOTA(RECKER): Confimar instalacion
 bot.action('sync_account', cuentaOptions.sync_account);
+
+// NOTA(RECKER): Invertir XP
+bot.action(['invertxp', 'invertxp_xpD', 'invertxp_vidaD'], invertXP.main);
+
+// NOTA(RECKER): Stats
+bot.command('stats', stats.main);
+
+// NOTA(RECKER): Ver otro stats
+bot.action(['stats_main', 'stats_debuff', 'stats_history'], stats.main);
 
 // NOTA(RECKER): Regresar
 bot.action('returns', returns);
