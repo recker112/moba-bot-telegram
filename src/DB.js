@@ -96,7 +96,7 @@ const start_db = async () => {
 		smoothness_discount FLOAT DEFAULT 2.5,
 		aggressiveness_discount FLOAT DEFAULT 4.5,
 		smoothness_aggregate FLOAT DEFAULT 5,
-		aggressiveness_aggregate FLOAT DEFAULT 8
+		aggressiveness_aggregate FLOAT DEFAULT 7
 	);`
 	
 	await client.query(sql);
@@ -174,7 +174,7 @@ const down_db = async () => {
 	console.log('Reiniciando db...');
 	
 	// NOTA(RECKER): Tabla experiences
-	let sql = 'DROP TABLE IF EXISTS experiences, effects, actions, parche_niveling, fights, postgress_sessions, config';
+	let sql = 'DROP TABLE IF EXISTS experiences, effects, actions, parche_niveling, fights, postgress_sessions';
 	
 	await client.query(sql);
 	

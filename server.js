@@ -8,8 +8,7 @@ const port = process.env.PORT || 3000;
 require('./bot.js');
 
 app.get('/', (req, res) => {
-	res.send('SERVIDOR PA!');
-	console.log(process.env.DATABASE_URL, DB);
+	res.sendFile('test.html', {root: __dirname })
 })
 
 app.listen(port, () => {

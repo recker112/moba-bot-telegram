@@ -5,6 +5,9 @@ const { init_state } = require('./Settings');
 const { Markup } = require('telegraf');
 const { vida_base_awaitResponse } = require('./settings/VidaBase');
 const { damage_base_awaitResponse } = require('./settings/DamageBase');
+const { xp_need_awaitResponse } = require('./settings/XpNeed');
+const { aggressiveness_awaitResponse } = require('./settings/Aggressiveness');
+const { smoothness_awaitResponse } = require('./settings/Smoothness');
 
 // NOTA(RECKER): Botones
 const buttons_controlConfig = Markup.inlineKeyboard([
@@ -14,10 +17,10 @@ const buttons_controlConfig = Markup.inlineKeyboard([
 	],
 	[
 		Markup.button.callback('XP para siguiente nivel', 'settings_xp_need'),
-		Markup.button.callback('Agresividad', 'settings_smoothness'),
+		Markup.button.callback('Agresividad', 'settings_aggressiveness'),
 	],
 	[
-		Markup.button.callback('Cariñosidad', 'settings_aggressiveness'),
+		Markup.button.callback('Cariñosidad', 'settings_smoothness'),
 		Markup.button.callback('Regresar', 'returns')
 	]
 ]);
@@ -44,6 +47,15 @@ const main = async (ctx) => {
 		return null;
 	}else if (ctx.match[0] === 'settings_damage_base') {
 		await damage_base_awaitResponse(ctx);
+		return null;
+	}else if (ctx.match[0] === 'settings_xp_need') {
+		await xp_need_awaitResponse(ctx);
+		return null;
+	}else if (ctx.match[0] === 'settings_aggressiveness') {
+		await aggressiveness_awaitResponse(ctx);
+		return null;
+	}else if (ctx.match[0] === 'settings_smoothness') {
+		await smoothness_awaitResponse(ctx);
 		return null;
 	}
 	

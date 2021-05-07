@@ -103,7 +103,7 @@ const damage_base = async (ctx) => {
 1) El texto introducido no es un número.
 2) La cantidad introducida es menor a 0
 
-Si desea cancelar puede usar el comando /cancel,`);
+Si desea cancelar puede usar el comando /cancel.`);
 	}else if (updated && !cancel_user) {
 		response = await ctx.replyWithMarkdown('Cambio realizado!');
 	} else {

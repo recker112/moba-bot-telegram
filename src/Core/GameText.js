@@ -5,6 +5,8 @@ const { removexp } = require('./settings/RemoveXP');
 const { addxp } = require('./settings/AddXP');
 const { vida_base } = require('./settings/VidaBase');
 const { damage_base } = require('./settings/DamageBase');
+const { xp_need } = require('./settings/XpNeed');
+const { smoothness } = require('./settings/Smoothness');
 
 const awaitResponse = async (ctx) => {
 	const awaitID = ctx.session.awaitID;
@@ -26,6 +28,18 @@ const awaitResponse = async (ctx) => {
 			
 		case 'damage_base':
 			await damage_base(ctx);
+			break;
+			
+		case 'xp_need':
+			await xp_need(ctx);
+			break;
+			
+		case 'aggressiveness':
+			await aggressiveness(ctx);
+			break;
+			
+		case 'smoothness':
+			await smoothness(ctx);
 			break;
 			
 		default:

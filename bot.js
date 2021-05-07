@@ -70,7 +70,7 @@ bot.settings(settings.main);
 bot.action(['settings_control_xp','settings_control_xp_add', 'settings_control_xp_remove'], controlXP);
 
 // NOTA(RECKER): Control de configuraciones
-bot.action(['settings_config', 'settings_vida_base', 'settings_damage_base', 'settings_smoothness', 'settings_aggressiveness'], controlConfig);
+bot.action(['settings_config', 'settings_vida_base', 'settings_damage_base', 'settings_xp_need', 'settings_smoothness', 'settings_aggressiveness'], controlConfig);
 
 // NOTA(RECKER): Registrar cuenta
 bot.command('registrar', registrar);

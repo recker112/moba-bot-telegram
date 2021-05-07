@@ -1,7 +1,7 @@
 // NOTA(RECKER): Conectarse a la DB
 const { Client } = require('pg');
 
-const aggressiveness_awaitResponse =  async (ctx) => {
+const smoothness_awaitResponse =  async (ctx) => {
 	// NOTA(RECKER): Obtener configuracion
 	const client = new Client({
 		connectionString: process.env.DATABASE_URL,
@@ -12,18 +12,18 @@ const aggressiveness_awaitResponse =  async (ctx) => {
 	
 	await client.connect();
 	
-	let sql = 'SELECT aggressiveness_discount, aggressiveness_aggregate FROM configs WHERE id=1';
+	let sql = 'SELECT smoothness_discount, smoothness_aggregate FROM configs WHERE id=1';
 	
 	let configs = await client.query(sql);
 	configs = configs.rows[0];
 	
 	client.end();
 	
-	let response = await ctx.replyWithMarkdown(`Estas son las cantidades de la *AGRESIVIDAD*:
+	let response = await ctx.replyWithMarkdown(`Estas son las cantidades de la *CARIÑOSIDAD*:
 
-- Agresividad a descontar por cada mensaje normal: *${configs.aggressiveness_discount}%*.
-- Agresividad a aumentar por decir una palabra agresiva: *${configs.aggressiveness_aggregate}%*.
-- Agresividad a aumentar por responder o @mencionar con una palabra agresiva: *${configs.aggressiveness_aggregate}% x 1.5*.
+- Cariñosidad a descontar por cada mensaje normal: *${configs.smoothness_discount}%*.
+- Cariñosidad a aumentar por decir una palabra cariñosa: *${configs.smoothness_aggregate}%*.
+- Cariñosidad a aumentar por responder o @mencionar con una palabra cariñosa: *${configs.smoothness_aggregate}% x 1.6*.
 
 El formato que debe usar para modificar alguna de estas opciones es el siguiente:
 
@@ -37,7 +37,7 @@ Si desea cancelar esta acción puede usar /cancel.`);
 	let find = -1;
 	let session = ctx.session.awaitResponse;
 	if (session) {
-		find = ctx.session.awaitResponse.findIndex(({type}) => type === 'aggressiveness');
+		find = ctx.session.awaitResponse.findIndex(({type}) => type === 'smoothness');
 	}else {
 		ctx.session.awaitResponse = [];
 	}
@@ -46,7 +46,7 @@ Si desea cancelar esta acción puede usar /cancel.`);
 	if (find > -1) {
 		const awaitResponse = ctx.session.awaitResponse[find];
 		ctx.session.awaitResponse[find] = {
-			type: 'aggressiveness',
+			type: 'smoothness',
 			message_remove: [
 				...awaitResponse.message_remove,
 				response.message_id,
@@ -57,7 +57,7 @@ Si desea cancelar esta acción puede usar /cancel.`);
 		let length = typeof ctx.session.awaitResponse !== 'object' ? 0 : ctx.session.awaitResponse.length;
 		
 		ctx.session.awaitResponse[length] = {
-			type: 'aggressiveness',
+			type: 'smoothness',
 			message_remove: [
 				response.message_id,
 			],
@@ -66,7 +66,7 @@ Si desea cancelar esta acción puede usar /cancel.`);
 	}
 }
 
-const aggressiveness = async (ctx) => {
+const smoothness = async (ctx) => {
 	// NOTA(RECKER): Obtener configs
 	const client = new Client({
 		connectionString: process.env.DATABASE_URL,
@@ -103,9 +103,9 @@ const aggressiveness = async (ctx) => {
 		params[1] = Math.round10(parseFloat(params[1].trim()), -2);
 		
 		if (params[0] === 'descontar') {
-			params[0] = 'aggressiveness_discount';
+			params[0] = 'smoothness_discount';
 		}else if (params[0] === 'aumentar') {
-			params[0] = 'aggressiveness_aggregate';
+			params[0] = 'smoothness_aggregate';
 		}else {
 			cancel = true;
 		}
@@ -117,7 +117,7 @@ const aggressiveness = async (ctx) => {
 		cancel = true;
 	}
 	
-	// NOTA(RECEKR): Cambiar aggressiveness
+	// NOTA(RECEKR): Cambiar smoothness
 	if (!cancel && params[1] > 0) {
 		sql = `UPDATE configs SET ${params[0]} = $1 WHERE id=1`;
 
@@ -130,7 +130,7 @@ const aggressiveness = async (ctx) => {
 	let text_id = ctx.message.message_id;
 	let response;
 	if (!updated && !cancel_user) {
-		response = await ctx.reply(`No se ha podido actualizar la agresividad, estas pueden ser sus causas:
+		response = await ctx.reply(`No se ha podido actualizar la cariñosidad, estas pueden ser sus causas:
 
 1) El formato no es el correcto.
 2) El segundo parámetro no es un número.
@@ -167,7 +167,7 @@ Si desea cancelar puede usar el comando /cancel.`);
 		remove_messages.push(response.message_id);
 		
 		ctx.session.awaitResponse[ctx.session.awaitID] = {
-			type: 'aggressiveness',
+			type: 'smoothness',
 			message_remove: [
 				...session.message_remove,
 				...remove_messages,
@@ -179,6 +179,6 @@ Si desea cancelar puede usar el comando /cancel.`);
 }
 
 module.exports = {
-	aggressiveness_awaitResponse,
-	aggressiveness,
+	smoothness_awaitResponse,
+	smoothness,
 }
