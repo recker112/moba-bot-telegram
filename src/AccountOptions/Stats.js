@@ -55,7 +55,28 @@ WHERE experiences.user_id=$1`;
 	let user = await client.query(sql,[ctx.from.id]);
 	user = user.rows[0];
 	
-	await client.end();
+	sql = `SELECT type, amount FROM debuffs
+WHERE user_id=$1 AND expired_at > now() :: timestamp`;
+	
+	let debuffs = await client.query(sql,[ctx.from.id]);
+	debuffs = debuffs.rows;
+	
+	client.end();
+	
+	// NOTA(RECKER): Obtener debuff
+	let stats = {
+		vida_debuff: 0,
+		damage_debuff: 0,
+	};
+	
+	debuffs.map((debuff) => {
+		let keys = Object.keys(stats);
+		keys.map((key) => {
+			if (debuff.type === key) {
+				stats[key] = stats[key] >= 75 ? 75 : stats[key] + debuff.amount;
+			}
+		});
+	});
 	
 	// NOTA(RECKER): Verificar existencia de cuenta
 	if (!user) {
@@ -69,12 +90,14 @@ WHERE experiences.user_id=$1`;
 	}
 	
 	// NOTA(RECKER): Calculos
-	const damage_base = config.damage_base * user.level;
-	const vida_base = config.vida_base * user.level;
+	let damage_base = config.damage_base * user.level;
+	damage_base = damage_base - ((damage_base * stats.damage_debuff) / 100);
+	let vida_base = config.vida_base * user.level;
+	vida_base = vida_base - ((vida_base * stats.vida_debuff) / 100);
 	
 	let damage = damage_base + ((damage_base * user.aggressiveness) / 100);
 	damage = Math.round10(damage, -2);
-	let vida = vida_base - ((vida_base * user.smoothness) / 100);
+	let vida = vida_base - ((vida_base * user.smoothness) / 100) || 0;
 	vida = vida > 0 ? Math.round10(vida, -2) : 0;
 	
 	const xp_acumulada = config.xp_need - ((user.level * config.xp_need) - user.points);
@@ -83,10 +106,11 @@ WHERE experiences.user_id=$1`;
 	// NOTA(RECKER): Texto
 	init_state.text = `Ficha de ${ctx.from.first_name} ${ctx.from.last_name}:
 Nivel: ${user.level} (${porcentaje_alcandado}%)
-EXP: ${user.points} pts_
-Daño: ${damage}_
-Vida: ${vida}_
-Insultos: ${user.insults}_
+EXP: ${user.points} pts
+Daño: ${damage}
+Vida: ${vida}
+Palabras agresivas: ${user.insults}
+Palabras cariñosas: ${user.blushed}
 
 ESTADOS:
 Agresividad: ${user.aggressiveness}%
@@ -147,11 +171,36 @@ WHERE experiences.user_id=$1`;
 	let user = await client.query(sql,[ctx.from.id]);
 	user = user.rows[0];
 	
+	sql = `SELECT type, amount FROM debuffs
+WHERE user_id=$1 AND expired_at > now() :: timestamp`;
+	
+	let debuffs = await client.query(sql,[ctx.from.id]);
+	debuffs = debuffs.rows;
+	
+	client.end();
+	
+	// NOTA(RECKER): Obtener debuff
+	let stats = {
+		vida_debuff: 0,
+		damage_debuff: 0,
+	};
+	
+	debuffs.map((debuff) => {
+		let keys = Object.keys(stats);
+		keys.map((key) => {
+			if (debuff.type === key) {
+				stats[key] = stats[key] >= 75 ? 75 : stats[key] + debuff.amount;
+			}
+		});
+	});
+	
 	client.end();
 	
 	// NOTA(RECKER): Calculos
-	const damage_base = config.damage_base * user.level;
-	const vida_base = config.vida_base * user.level;
+	let damage_base = config.damage_base * user.level;
+	damage_base = damage_base - ((damage_base * stats.damage_debuff) / 100);
+	let vida_base = config.vida_base * user.level;
+	vida_base = vida_base - ((vida_base * stats.vida_debuff) / 100);
 	
 	let damage = damage_base + ((damage_base * user.aggressiveness) / 100);
 	damage = Math.round10(damage, -2);
@@ -167,15 +216,20 @@ Nivel: ${user.level} (${porcentaje_alcandado}%)
 EXP: ${user.points} pts
 Daño: ${damage}
 Vida: ${vida}
-Insultos: ${user.insults}
+Palabras agresivas: ${user.insults}
+Palabras cariñosas: ${user.blushed}
 
 ESTADOS:
 Agresividad: ${user.aggressiveness}%
 Cariñosidad: ${user.smoothness}%`;
 	
-	let response = await ctx.editMessageText(init_state.text, {
-		reply_markup: init_state.buttons.reply_markup,
-	});
+	try {
+		let response = await ctx.editMessageText(init_state.text, {
+			reply_markup: init_state.buttons.reply_markup,
+		});
+	} catch(e) {
+		console.log('No changes message');
+	}
 }
 
 const stats_debuff = async (ctx) => {
@@ -228,18 +282,25 @@ WHERE user_id=$1 AND expired_at > now() :: timestamp`;
 			}
 		});
 	});
+	stats.xp_debuff = stats.xp_debuff > 75 ? 75 : stats.xp_debuff;
+	stats.vida_debuff = stats.vida_debuff > 75 ? 75 : stats.vida_debuff;
+	
 	
 	// NOTA(RECKER): Texto
 	init_state.text = `Estados extras de ${ctx.from.first_name} ${ctx.from.last_name}:
 XP debuff: -${stats.xp_debuff}%
-Vida debuff: -${stats.vida_debuff}%
-Daño debuff: -${stats.vida_debuff}%
+Vida base debuff: -${stats.vida_debuff}%
+Daño base debuff: -${stats.damage_debuff}%
 Borrar siguiente mensaje: ${stats.delete_message}
 Borrar mensaje random: ${stats.delete_message_random}`;
 	
-	let response = await ctx.editMessageText(init_state.text, {
-		reply_markup: init_state.buttons.reply_markup,
-	});
+	try {
+		let response = await ctx.editMessageText(init_state.text, {
+			reply_markup: init_state.buttons.reply_markup,
+		});
+	} catch(e) {
+		console.log('No changes message');
+	}
 }
 
 const stats_history = async (ctx) => {
@@ -269,7 +330,9 @@ const stats_history = async (ctx) => {
 	
 	let sql = `SELECT users.username, debuffs.type, debuffs.xp_amount FROM debuffs
 INNER JOIN users ON users.id = debuffs.user_from
-WHERE user_id=$1 AND expired_at > now() :: timestamp LIMIT 10`;
+WHERE user_id=$1 AND expired_at > now() :: timestamp
+ORDER BY expired_at DESC
+LIMIT 10`;
 	
 	let debuffs = await client.query(sql,[ctx.from.id]);
 	debuffs = debuffs.rows;
@@ -281,8 +344,8 @@ WHERE user_id=$1 AND expired_at > now() :: timestamp LIMIT 10`;
 		xp_debuff: 'debufo de xp',
 		vida_debuff: 'debufo de xp',
 		damage_debuff: 'debufo de daño',
-		delete_message: 'borrar mensaje(s)',
-		delete_message_random: 'borrar mensaje(s) random',
+		delete_message: 'debufo de borrar mensaje(s)',
+		delete_message_random: 'debufo de borrar mensaje(s) random',
 	};
 
 	let debuff_history = '';
@@ -303,9 +366,13 @@ WHERE user_id=$1 AND expired_at > now() :: timestamp LIMIT 10`;
 
 ${debuff_history}`;
 	
-	let response = await ctx.editMessageText(init_state.text, {
-		reply_markup: init_state.buttons.reply_markup,
-	});
+	try {
+		let response = await ctx.editMessageText(init_state.text, {
+			reply_markup: init_state.buttons.reply_markup,
+		});
+	} catch(e) {
+		console.log('No changes message');
+	}
 }
 
 module.exports = {

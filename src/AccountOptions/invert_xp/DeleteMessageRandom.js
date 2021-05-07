@@ -3,8 +3,8 @@ const { Client } = require('pg');
 
 const { calculate_level } = require('../../Core/settings/AddXP');
 
-const xp_debuff_awaitResponse =  async (ctx) => {
-	let response = await ctx.replyWithMarkdown(`Para agregar el debuffo de *XP* use siguiente formato:
+const delete_message_random_awaitResponse =  async (ctx) => {
+	let response = await ctx.replyWithMarkdown(`Para agregar el debuffo de *ELIMINAR MENSAJE RANDOM* use siguiente formato:
 
 @usuario - cantidad
 
@@ -14,7 +14,7 @@ Para cancelar simplemente escriba /cancel.`);
 	let find = -1;
 	let session = ctx.session.awaitResponse;
 	if (session) {
-		find = ctx.session.awaitResponse.findIndex(({type}) => type === 'xp_debuff');
+		find = ctx.session.awaitResponse.findIndex(({type}) => type === 'delete_message_random');
 	}else {
 		ctx.session.awaitResponse = [];
 	}
@@ -23,7 +23,7 @@ Para cancelar simplemente escriba /cancel.`);
 	if (find > -1) {
 		const awaitResponse = ctx.session.awaitResponse[find];
 		ctx.session.awaitResponse[find] = {
-			type: 'xp_debuff',
+			type: 'delete_message_random',
 			message_remove: [
 				...awaitResponse.message_remove,
 				response.message_id,
@@ -34,7 +34,7 @@ Para cancelar simplemente escriba /cancel.`);
 		let length = typeof ctx.session.awaitResponse !== 'object' ? 0 : ctx.session.awaitResponse.length;
 		
 		ctx.session.awaitResponse[length] = {
-			type: 'xp_debuff',
+			type: 'delete_message_random',
 			message_remove: [
 				response.message_id,
 			],
@@ -43,7 +43,7 @@ Para cancelar simplemente escriba /cancel.`);
 	}
 }
 
-const xp_debuff = async (ctx) => {
+const delete_message_random = async (ctx) => {
 	// NOTA(RECKER): Obtener configs
 	const client = new Client({
 		connectionString: process.env.DATABASE_URL,
@@ -84,7 +84,7 @@ const xp_debuff = async (ctx) => {
 	// NOTA(RECKER): Obtener usuario
 	let user;
 	let sql;
-	let consume_xp = 60;
+	let consume_xp = 140;
 	if (!cancel) {
 		sql = `SELECT * FROM users WHERE username=$1`;
 			
@@ -111,7 +111,7 @@ const xp_debuff = async (ctx) => {
 			config = config.rows[0];
 			
 			// NOTA(RECKER): Agregar debufo
-			sql = `INSERT INTO debuffs(user_id, user_from, type, amount, xp_amount, expired_at) VALUES ($1, $2, 'xp_debuff', $3, $4, now()::timestamp + '48 hr'::INTERVAL)`;
+			sql = `INSERT INTO debuffs(user_id, user_from, type, amount, xp_amount, expired_at) VALUES ($1, $2, 'delete_message_random', $3, $4, now()::timestamp + '48 hr'::INTERVAL)`;
 
 			await client.query(sql, [user.id, ctx.from.id, params[1], consume_xp*params[1]]);
 			
@@ -132,15 +132,15 @@ const xp_debuff = async (ctx) => {
 	let text_id = ctx.message.message_id;
 	let response;
 	if (!user && !insert && !cancel_user && !cancel) {
-		response = await ctx.replyWithMarkdown(`No se ha podido agregar el debufo de *XP* porque el *usuario* seleccionado *no se encuentra registrado*, por favor intente con uno registrado.
+	response = await ctx.replyWithMarkdown(`No se ha podido agregar el debufo de *ELIMINAR MENSAJE RANDOM* porque el *usuario* seleccionado *no se encuentra registrado*, por favor intente con uno registrado.
 
 Si desea cancelar puede usar el comando /cancel.`);
 	}else if (not_points && !insert && !cancel_user) {
-		response = await ctx.replyWithMarkdown(`No se ha podido agregar el debufo de *XP* porque *no dispone de ${not_points}XP* para realizar esta acción, por favor *intente con una cantidad menor*.
+		response = await ctx.replyWithMarkdown(`No se ha podido agregar el debufo de *ELIMINAR MENSAJE RANDOM* porque *no dispone de ${not_points}XP* para realizar esta acción, por favor *intente con una cantidad menor*.
 
 Si desea cancelar puede usar el comando /cancel.`);
 	}else if (!insert && !cancel_user) {
-		response = await ctx.reply(`No se ha podido agregar el debufo de XP, estas pueden ser sus causas:
+		response = await ctx.replyWithMarkdown(`No se ha podido agregar el debufo de *ELIMINAR MENSAJE RANDOM*, estas pueden ser sus causas:
 
 1) Error en el formato.
 2) El segundo parámetro no es un número.
@@ -179,7 +179,7 @@ Si desea cancelar puede usar el comando /cancel.`);
 		remove_messages.push(response.message_id);
 		
 		ctx.session.awaitResponse[ctx.session.awaitID] = {
-			type: 'xp_debuff',
+			type: 'delete_message_random',
 			message_remove: [
 				...session.message_remove,
 				...remove_messages,
@@ -191,6 +191,6 @@ Si desea cancelar puede usar el comando /cancel.`);
 }
 
 module.exports = {
-	xp_debuff_awaitResponse,
-	xp_debuff,
+	delete_message_random_awaitResponse,
+	delete_message_random,
 }

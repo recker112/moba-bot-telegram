@@ -41,7 +41,7 @@ const { Client } = require('pg');
 const bot = new Telegraf(process.env.BOT_TOKEN);
 
 // NOTA(RECKER): Configuraciones de puntos
-process.env.VERSION = 'v1.0.2';
+process.env.VERSION = 'v2.0.0';
 bot.use((new PostgresSession({
 	connectionString: process.env.DATABASE_URL,
 		ssl: {
@@ -95,7 +95,7 @@ bot.command('cuenta', cuentaOptions.cuenta);
 bot.action('sync_account', cuentaOptions.sync_account);
 
 // NOTA(RECKER): Invertir XP
-bot.action(['invertxp', 'invertxp_xpD', 'invertxp_vidaD'], invertXP.main);
+bot.action(['invertxp', 'invertxp_xpD', 'invertxp_vidaD', 'invertxp_damageD', 'invertxp_deleteMD', 'invertxp_deleteMRD'], invertXP.main);
 
 // NOTA(RECKER): Stats
 bot.command('stats', stats.main);
@@ -109,7 +109,7 @@ bot.action('returns', returns);
 // NOTA(RECKER): Cerrar mensaje
 bot.action('close', close);
 
-bot.on('text', gameText);
+bot.on('text', gameText.main);
 
 bot.on('message', gameOthers);
 /*

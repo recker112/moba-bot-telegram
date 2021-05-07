@@ -25,84 +25,71 @@ const gameOthers = async (ctx) => {
 	}
 	
 	// NOTA(RECKER): Obtener datos del usuario
-	sql = `SELECT experiences.user_id as id, experiences.points, experiences.level, parche_niveling.xp_debuff, parche_niveling.aggressiveness_debuff, parche_niveling.smoothness_debuff FROM experiences
+	sql = `SELECT experiences.user_id as id, experiences.points, experiences.level, effects.aggressiveness, effects.smoothness FROM experiences
 INNER JOIN effects ON effects.user_id = experiences.user_id
-LEFT JOIN parche_niveling ON parche_niveling.user_id = experiences.user_id
 WHERE experiences.user_id=$1`;
 	
-	let experiences = await client.query(sql,[ctx.from.id]);
-	experiences = experiences.rows[0];
+	let user_data = await client.query(sql,[ctx.from.id]);
+	user_data = user_data.rows[0];
 	
 	// NOTA(RECKER): No hacer nada si el usuario no estรก registrado
-	if (!experiences) {
+	if (!user_data) {
 		await client.end();
 		return null;
 	}
-	console.log(experiences, 'ANTES');
 	
 	// NOTA(RECKER): Obtener debuff
-	sql = `SELECT debuffs.*, users.username FROM debuffs
-INNER JOIN users ON users.id = debuffs.user_from
-WHERE user_id=$1 AND expired_at > now() :: timestamp`;
+	sql = `SELECT amount FROM debuffs
+WHERE user_id=$1 AND expired_at > now() :: timestamp AND type = 'xp_debuff'`;
 	
 	let debuffs = await client.query(sql,[ctx.from.id]);
 	debuffs = debuffs.rows;
 	
 	// NOTA(RECKER): Acumular debuff
-	let stats = {
+	let debuffs_actives = {
 		xp_debuff: 0,
-		vida_debuff: 0,
-		damage_debuff: 0,
-		delete_message: 0,
-		delete_message_random: 0,
-		user_from: {},
 	};
 
 	debuffs.map((debuff) => {
-		let keys = Object.keys(stats);
+		let keys = Object.keys(debuffs_actives);
 		keys.map((key) => {
 			if (debuff.type === key) {
-				stats[key] += debuff.amount;
-				
-				// NOTA(RECKER): Obtener el username_from
-				stats.user_from[key] = !stats.user_from[key] ? debuff.username : stats.user_from[key];
+				debuffs_actives[key] += debuff.amount;
 			}
 		});
 	});
 	
-	// NOTA(RECKER): Dar puntos
-	let ganado = ((config.points_base * 2) * config.double_exp);
-	const xp_debuff = parseFloat(config.xp_debuff);
-	if (xp_debuff > 0) {
-		ganado = (ganado * xp_debuff) / 100;
-	}
-	
-	experiences.points += Math.round10(ganado, -2);
-	sql = `UPDATE experiences
-		SET points=$1
-		WHERE user_id=$2`;
-
-	await client.query(sql,[experiences.points,ctx.from.id]);
-	
-	// NOTA(RECKER): Dar effectos
-	sql = `UPDATE effects SET 
-smoothness=CASE WHEN smoothness > $1 THEN smoothness - $1 ELSE 0 END, 
-aggressiveness=CASE WHEN aggressiveness > $2 THEN aggressiveness - $2 ELSE 0 END
-WHERE user_id=$3`;
-	
-	await client.query(sql,[config.smoothness_discount,config.aggressiveness_discount,ctx.from.id]);
-
-	// NOTA(RECKER): Aumentar nivel
-	if (experiences.points >= (experiences.level * config.xp_need)) {
-		experiences.level++
-		sql = `UPDATE experiences
-		SET level=$1
-		WHERE user_id=$2`;
+	// NOTA(RECKER): Descontar efectos si no se ha dicho nada
+	user_data.aggressiveness -= config.aggressiveness_discount;
+	user_data.aggressiveness = user_data.aggressiveness <= 0 ? 0 : user_data.aggressiveness;
+	user_data.aggressiveness = Math.round10(user_data.aggressiveness, -2);
 		
-		await client.query(sql,[experiences.level,ctx.from.id]);
+	user_data.smoothness -= config.smoothness_discount;
+	user_data.smoothness = user_data.smoothness <= 0 ? 0 : user_data.smoothness;
+	user_data.smoothness = Math.round10(user_data.smoothness, -2);
+	
+	// NOTA(RECKER): Agregar xp base
+	let addxp_messages = 2;
+	addxp_messages += config.points_base * config.double_exp;
+	user_data.points += addxp_messages - (debuffs_actives.xp_debuff * addxp_messages) / 100 || 0;
+	user_data.points = Math.round10(user_data.points, -2);
+	
+	// NOTA(RECKER): Aumentar nivel
+	if (user_data.points >= (user_data.level * config.xp_need)) {
+		user_data.level++;
 	}
 	
-	console.log(experiences);
+	// NOTA(RECKER): Actualizar datos
+	sql = `UPDATE experiences
+		SET points=$1, level=$2
+		WHERE user_id=$3`;
+	
+	await client.query(sql,[user_data.points, user_data.level, ctx.from.id]);
+	
+	sql = `UPDATE effects SET aggressiveness=$1, smoothness=$2 WHERE user_id=$3`;
+	
+	await client.query(sql,[user_data.aggressiveness, user_data.smoothness, ctx.from.id]);
+	
 	await client.end();
 }
 

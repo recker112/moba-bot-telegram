@@ -108,19 +108,6 @@ const start_db = async () => {
 		await client.query(sql);
 	}
 	
-	// NOTA(RECKER): Tabla parche_niveling
-	sql = `CREATE TABLE IF NOT EXISTS parche_niveling (
-		id SERIAL,
-		user_id INT UNIQUE,
-		xp_debuff FLOAT NOT NULL DEFAULT 0,
-		vida_debuff FLOAT NOT NULL DEFAULT 0,
-		damage_debuff FLOAT NOT NULL DEFAULT 0,
-		aggressiveness_debuff FLOAT NOT NULL DEFAULT 0,
-		smoothness_debuff FLOAT NOT NULL DEFAULT 0
-	);`
-	
-	await client.query(sql);
-	
 	// NOTA(RECKER): Tabla words
 	sql = `CREATE TABLE IF NOT EXISTS words (
 		word VARCHAR(50) NOT NULL UNIQUE,
@@ -168,7 +155,7 @@ const down_db = async () => {
 	console.log('Reiniciando db...');
 	
 	// NOTA(RECKER): Tabla experiences
-	let sql = 'DROP TABLE IF EXISTS experiences, effects, debuffs, parche_niveling, fights, postgress_sessions';
+	let sql = 'DROP TABLE IF EXISTS experiences, effects, debuffs, fights, postgress_sessions';
 	
 	await client.query(sql);
 	

@@ -110,9 +110,13 @@ const list_words1 = async (ctx) => {
 
 ${wordsList}`;
 	
-	let response = await ctx.editMessageText(init_state.text, {
-		reply_markup: init_state.buttons.reply_markup,
-	});
+	try {
+		let response = await ctx.editMessageText(init_state.text, {
+			reply_markup: init_state.buttons.reply_markup,
+		});
+	} catch(e) {
+		console.log('No changes message');
+	}
 }
 
 const list_words2 = async (ctx) => {
@@ -156,9 +160,13 @@ const list_words2 = async (ctx) => {
 
 ${wordsList}`;
 	
-	let response = await ctx.editMessageText(init_state.text, {
-		reply_markup: init_state.buttons.reply_markup,
-	});
+	try {
+		let response = await ctx.editMessageText(init_state.text, {
+			reply_markup: init_state.buttons.reply_markup,
+		});
+	} catch(e) {
+		console.log('No changes message');
+	}
 }
 
 module.exports = {

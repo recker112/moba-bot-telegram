@@ -10,13 +10,10 @@ const buttons_init = Markup.inlineKeyboard([
 		Markup.button.callback('Configuraciones', 'settings_config'),
 	],
 	[
-		Markup.button.callback('Efectos del parche', 'settings_parche'),
+		Markup.button.callback('Eliminar datos sin uso', 'settings_datos'),
 		Markup.button.callback('Configurar palabras', 'settings_words'),
 	],
-	[
-		Markup.button.callback('Eliminar datos sin uso', 'settings_datos'),
-		Markup.button.callback('Cerrar', 'close')
-	],
+	[Markup.button.callback('Cerrar', 'close')],
 ]);
 
 let init_state = {
@@ -40,7 +37,7 @@ const main = async (ctx) => {
 	configs = configs.rows[0];
 	
 	if (configs.owner_id != ctx.from.id) {
-		let response = await ctx.reply('Solo el que inició el bot por primera vez puede realizar esta acción');
+		let response = await ctx.reply('Solo el que iniciรณ el bot por primera vez puede realizar esta acciรณn');
 		
 		setTimeout(() => {
 			ctx.deleteMessage(response.message_id);
