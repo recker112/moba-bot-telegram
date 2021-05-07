@@ -157,7 +157,7 @@ Si desea cancelar puede usar el comando /cancel.`);
 
 Si desea cancelar puede usar el comando /cancel.`);
 	}else if (querys > updates && !cancel_user) {
-		response = await ctx.reply(`Algunas lineas fueron procesadas correctamente, las lineas que no se procesaron :
+		response = await ctx.reply(`Algunas lineas fueron procesadas correctamente, los errores en las demás lineas se debe a:
 
 1) El formato no es correcto.
 2) El segundo parámetros no es un número o es mejor a 0.

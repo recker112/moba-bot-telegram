@@ -7,6 +7,9 @@ const { vida_base } = require('./settings/VidaBase');
 const { damage_base } = require('./settings/DamageBase');
 const { xp_need } = require('./settings/XpNeed');
 const { smoothness } = require('./settings/Smoothness');
+const { addword1 } = require('./settings/AddWords1');
+const { addword2 } = require('./settings/AddWords2');
+const { removeword } = require('./settings/RemoveWords');
 
 const awaitResponse = async (ctx) => {
 	const awaitID = ctx.session.awaitID;
@@ -42,8 +45,21 @@ const awaitResponse = async (ctx) => {
 			await smoothness(ctx);
 			break;
 			
+		case 'addword1':
+			await addword1(ctx);
+			break;
+			
+		case 'addword2':
+			await addword2(ctx);
+			break;
+			
+		case 'removeword':
+			await removeword(ctx);
+			break;
+			
 		default:
 			ctx.session.awaitResponse.splice(awaitID,1);
+			ctx.session.awaitID = null;
 	}
 }
 

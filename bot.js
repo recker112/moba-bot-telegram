@@ -10,6 +10,7 @@ const gameOthers = require('./src/Core/GameOthers');
 const settings = require('./src/Core/Settings');
 const controlXP = require('./src/Core/ControlXP');
 const controlConfig = require('./src/Core/ControlConfigs');
+const controlWords = require('./src/Core/ControlWords');
 
 const resetOptions = require('./src/MainOptions/Reset');
 const mainOptions = require('./src/MainOptions');
@@ -71,6 +72,9 @@ bot.action(['settings_control_xp','settings_control_xp_add', 'settings_control_x
 
 // NOTA(RECKER): Control de configuraciones
 bot.action(['settings_config', 'settings_vida_base', 'settings_damage_base', 'settings_xp_need', 'settings_smoothness', 'settings_aggressiveness'], controlConfig);
+
+// NOTA(RECKER): Control de palabras
+bot.action(['settings_words', 'settings_addword_1', 'settings_addword_2', 'settings_removeword'], controlWords);
 
 // NOTA(RECKER): Registrar cuenta
 bot.command('registrar', registrar);

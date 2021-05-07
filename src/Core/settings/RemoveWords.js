@@ -1,34 +1,19 @@
 // NOTA(RECKER): Conectarse a la DB
 const { Client } = require('pg');
 
-const calculate_level_down = (xp, level_user, xp_need) => {
-	let level = level_user;
-	
-	let cancel = true;
-	while(cancel) {
-		if (level > 1 && xp < (level * xp_need)) {
-			level--;
-		}else {
-			cancel=false;
-		}
-	}
-	
-	return level;
-}
+const removeword_awaitResponse =  async (ctx) => {
+	let response = await ctx.reply(`Para una palabra al sistema use el siguiente formato:
 
-const removexp_awaitResponse =  async (ctx) => {
-	let response = await ctx.reply(`Para remover xp a un usuario use el siguiente formato:
+palabra1
+palabra2
 
-@usuario1 - 3.8
-@usuario2 - 4000
-
-Para cancelar simplemente escriba /cancel`);
+Para cancelar simplemente escriba /cancel.`);
 	
 	// NOTA(RECKER): Obtener infex
 	let find = -1;
 	let session = ctx.session.awaitResponse;
 	if (session) {
-		find = ctx.session.awaitResponse.findIndex(({type}) => type === 'removexp');
+		find = ctx.session.awaitResponse.findIndex(({type}) => type === 'removeword');
 	}else {
 		ctx.session.awaitResponse = [];
 	}
@@ -37,7 +22,7 @@ Para cancelar simplemente escriba /cancel`);
 	if (find > -1) {
 		const awaitResponse = ctx.session.awaitResponse[find];
 		ctx.session.awaitResponse[find] = {
-			type: 'removexp',
+			type: 'removeword',
 			message_remove: [
 				...awaitResponse.message_remove,
 				response.message_id,
@@ -48,16 +33,17 @@ Para cancelar simplemente escriba /cancel`);
 		let length = typeof ctx.session.awaitResponse !== 'object' ? 0 : ctx.session.awaitResponse.length;
 		
 		ctx.session.awaitResponse[length] = {
-			type: 'removexp',
+			type: 'removeword',
 			message_remove: [
 				response.message_id,
 			],
 		}
 		ctx.session.awaitID = length;
 	}
+	
 }
 
-const removexp = async (ctx) => {
+const removeword = async (ctx) => {
 	// NOTA(RECKER): Obtener configs
 	const client = new Client({
 		connectionString: process.env.DATABASE_URL,
@@ -77,7 +63,7 @@ const removexp = async (ctx) => {
 	let text = ctx.message.text;
 	text = text.split('\n');
 	let querys = 0;
-	let updates = 0;
+	let deletes = 0;
 	let remove_messages = [];
 	
 	// NOTA(RECKER): Verificar cancel
@@ -89,51 +75,24 @@ const removexp = async (ctx) => {
 	// NOTA(RECEKR): Recorrer texto
 	let i=0;
 	while (text[i]) {
-		const line = text[i];
+		let line = text[i];
+		line = line.trim();
 		
-		let params = line.split('-');
-		let cancel = false;
-		if (params.length !== 2) {
-			cancel = true;
-		}
-		
-		if (!cancel) {
-			params[0] = params[0].trim();
-			params[1] = parseFloat(params[1].trim());
-		}
-		
-		if (!cancel && !params[1]) {
-			cancel = true;
-		}
-		
-		let user;
-		if (!cancel) {
-			sql = 'SELECT users.id, experiences.points, experiences.level FROM users INNER JOIN experiences ON experiences.user_id = users.id WHERE username=$1';
-		
-			user = await client.query(sql,[params[0].slice(1)]);
-			user = user.rows[0]
-		}
-		
-		if (!cancel && user) {
-			sql = 'UPDATE experiences SET points=CASE WHEN points > $1 THEN points - $1 ELSE 0 END WHERE user_id=$2';
-
-			await client.query(sql, [params[1],user.id]);
-
-			user.points -= params[1];
-
-			// NOTA(RECKER): Quitar nivel
-			let levels = calculate_level_down(user.points, user.level, config.xp_need);
-			sql = 'UPDATE experiences SET level=$1 WHERE user_id=$2';
+		// NOTA(RECKER): Agregar palabra
+		try {
+			let sql = 'DELETE FROM words WHERE word=$1';
 			
-			await client.query(sql,[levels,user.id]);
-			
-			updates++;
-			querys++;
-		} else {
-			if (!cancel) {
-				querys++;
+			const res = await client.query(sql, [line]);
+
+			if (!res.rowCount) {
+				throw new Error('No register');
 			}
+
+			deletes++;
+		}catch (e) {
+			// Nothing
 		}
+		querys++;
 		i++;
 	}
 	
@@ -141,30 +100,30 @@ const removexp = async (ctx) => {
 	let text_id = ctx.message.message_id;
 	let response;
 	if (!querys && !cancel_user) {
-		response = await ctx.reply(`Para remover xp a un usuario use el siguiente formato:
+		response = await ctx.reply(`Para una palabra al sistema use el siguiente formato:
 
-@usuario1 - 3.8
-@usuario2 - 4000
+palabra1
+palabra2
 
-Si desea cancelar puede usar el comando /cancel.`);
-	}else if (querys && !updates && !cancel_user) {
+Para cancelar simplemente escriba /cancel.`);
+	}else if (querys && !deletes && !cancel_user) {
 		response = await ctx.reply(`Ninguna de las lineas ingresadas se pudo procesar, es posible que esto se deba a los siguientes puntos:
 
 1) El formato no es correcto.
-2) El segundo parámetros no es un número o es mejor a 0.
-3) Los usuarios no se encuentran registrados.
+2) No se encuentra en la base de datos.
+3) Problemas con el servidor.
 
 Si desea cancelar puede usar el comando /cancel.`);
-	}else if (querys > updates && !cancel_user) {
+	}else if (querys > deletes && !cancel_user) {
 		response = await ctx.reply(`Algunas lineas fueron procesadas correctamente, los errores en las demás lineas se debe a:
 
 1) El formato no es correcto.
-2) El segundo parámetros no es un número o es mejor a 0.
-3) El usuario no se encuentra registrado.
+2) No se encuentra en la base de datos.
+3) Problemas con el servidor.
 
 Si desea cancelar puede usar el comando /cancel.`);
-	} else if (querys && updates && querys === updates && !cancel_user) {
-		response = await ctx.replyWithMarkdown('Experiencias removidas!');
+	} else if (querys && deletes && querys === deletes && !cancel_user) {
+		response = await ctx.replyWithMarkdown('Palabras eliminadas!');
 	} else {
 		response = await ctx.replyWithMarkdown('Acción cancelada!');
 	}
@@ -173,7 +132,7 @@ Si desea cancelar puede usar el comando /cancel.`);
 	remove_messages.push(text_id);
 	
 	let session = ctx.session.awaitResponse[ctx.session.awaitID];
-	if ((querys && updates && querys === updates) || cancel_user) {
+	if ((querys && deletes && querys === deletes) || cancel_user) {
 		// NOTA(RECKER): Eliminar session finalizada
 		setTimeout(() => {
 			ctx.deleteMessage(response.message_id);
@@ -193,7 +152,7 @@ Si desea cancelar puede usar el comando /cancel.`);
 		remove_messages.push(response.message_id);
 		
 		ctx.session.awaitResponse[ctx.session.awaitID] = {
-			type: 'removexp',
+			type: 'removeword',
 			message_remove: [
 				...session.message_remove,
 				...remove_messages,
@@ -205,6 +164,6 @@ Si desea cancelar puede usar el comando /cancel.`);
 }
 
 module.exports = {
-	removexp,
-	removexp_awaitResponse,
-};
+	removeword_awaitResponse,
+	removeword,
+}
