@@ -75,6 +75,10 @@ const addword2 = async (ctx) => {
 	// NOTA(RECEKR): Recorrer texto
 	let i=0;
 	while (text[i]) {
+		if (cancel_user) {
+			break;
+		}
+		
 		let line = text[i];
 		line = line.trim();
 		

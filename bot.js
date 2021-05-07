@@ -11,6 +11,7 @@ const settings = require('./src/Core/Settings');
 const controlXP = require('./src/Core/ControlXP');
 const controlConfig = require('./src/Core/ControlConfigs');
 const controlWords = require('./src/Core/ControlWords');
+const wordList = require('./src/Core/WordList');
 
 const resetOptions = require('./src/MainOptions/Reset');
 const mainOptions = require('./src/MainOptions');
@@ -75,6 +76,12 @@ bot.action(['settings_config', 'settings_vida_base', 'settings_damage_base', 'se
 
 // NOTA(RECKER): Control de palabras
 bot.action(['settings_words', 'settings_addword_1', 'settings_addword_2', 'settings_removeword'], controlWords);
+
+// NOTA(RECKER): Ver lista de palabras
+bot.command('wordlist', wordList.main);
+
+// NOTA(RECKER): Ver otra lista de palabras
+bot.action(['list_words1', 'list_words2'], wordList.main);
 
 // NOTA(RECKER): Registrar cuenta
 bot.command('registrar', registrar);

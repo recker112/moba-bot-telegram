@@ -89,6 +89,10 @@ const removexp = async (ctx) => {
 	// NOTA(RECEKR): Recorrer texto
 	let i=0;
 	while (text[i]) {
+		if (cancel_user) {
+			break;
+		}
+		
 		const line = text[i];
 		
 		let params = line.split('-');

@@ -19,6 +19,7 @@ const start = async (ctx) => {
 		{ command: '/registrar', description: 'Registrate para poder comenzar a jugar' },
 		{ command: '/cuenta', description: 'Maneja diferentes opciones de tu cuenta' },
 		{ command: '/settings', description: 'Configuraciones del sistema' },
+		{ command: '/wordlist', description: 'Lista de palabras disponibles' },
 	];
 	
 	const client = new Client({

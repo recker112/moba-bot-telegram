@@ -75,12 +75,17 @@ const addword1 = async (ctx) => {
 	// NOTA(RECEKR): Recorrer texto
 	let i=0;
 	while (text[i]) {
+		if (cancel_user) {
+			break;
+		}
+		
 		let line = text[i];
 		line = line.trim();
 		let cancel = false;
 		
 		// NOTA(RECKER): Agregar palabra
 		try {
+			
 			let sql = 'INSERT INTO words (word,status) VALUES ($1,1)';
 
 			const res = await client.query(sql, [line]);
