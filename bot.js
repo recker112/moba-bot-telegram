@@ -1,6 +1,7 @@
 // NOTA(RECKER): Importanciones
 const startOptions = require('./src/MainOptions/Start');
 const setupOptions = require('./src/MainOptions/Setup');
+const helpOptions = require('./src/MainOptions/Help');
 const registrar = require('./src/AccountOptions/Registrar');
 const cuentaOptions = require('./src/AccountOptions/Cuenta');
 const close = require('./src/Close');
@@ -14,6 +15,12 @@ const controlWords = require('./src/Core/ControlWords');
 const wordList = require('./src/Core/WordList');
 const stats = require('./src/AccountOptions/Stats');
 const invertXP = require('./src/AccountOptions/InvertXP');
+const top = require('./src/Core/Top');
+const topSeason = require('./src/Core/TopSeason');
+const cprendio = require('./src/Core/CPrendio');
+const duelo = require('./src/Games/Duelo');
+const unirseDuelo = require('./src/Games/Duelo/Unirse');
+const closeGame = require('./src/CloseGame');
 
 const resetOptions = require('./src/MainOptions/Reset');
 const mainOptions = require('./src/MainOptions');
@@ -70,6 +77,9 @@ bot.action('confirm_reset', resetOptions.confirm_reset);
 // NOTA(RECKER): Configuraciones
 bot.settings(settings.main);
 
+// NOTA(RECKER): Ayuda
+bot.help(helpOptions);
+
 // NOTA(RECKER): Control XP
 bot.action(['settings_control_xp','settings_control_xp_add', 'settings_control_xp_remove'], controlXP);
 
@@ -103,11 +113,32 @@ bot.command('stats', stats.main);
 // NOTA(RECKER): Ver otro stats
 bot.action(['stats_main', 'stats_debuff', 'stats_history'], stats.main);
 
+// NOTA(RECKER): Top
+bot.command('top', top);
+
+// NOTA(RECKER): Ver otros tops
+bot.action(['season_top_1', 'season_top_2', 'season_top_3', 'season_top_4', 'season_top_5'], top);
+
+// NOTA(RECKER): Top season
+bot.command('topseason', topSeason);
+
+// NOTA(RECKER): C prendio
+bot.command('fire', cprendio);
+
+// NOTA(RECKER): DUDUDUDUUDUDUDDU DUELO
+bot.command('duelo', duelo)
+
+// NOTA(RECKER): Duelo CORE
+bot.action('game_duelo_unir', unirseDuelo);
+
 // NOTA(RECKER): Regresar
 bot.action('returns', returns);
 
 // NOTA(RECKER): Cerrar mensaje
 bot.action('close', close);
+
+// NOTA(RECKER): Cerrar game
+bot.action('close_game', closeGame);
 
 bot.on('text', gameText.main);
 
@@ -115,14 +146,6 @@ bot.on('message', gameOthers);
 /*
 
 /*
-bot.help(ctx => {
-	mainOptions.help(ctx);
-});
-
-bot.settings(ctx => {
-	mainOptions.settings(ctx);
-});
-
 // NOTA(RECKER): Prender el carro manual
 bot.command('c_prendio', async ctx => {
 	gameOptions.c_prendio(ctx, double);
@@ -160,35 +183,6 @@ bot.command('addword_soft', async ctx => {
 	settings.addword_soft(ctx);
 });
 
-// NOTA(RECKER): Agregar palabras
-bot.command('addword', async ctx => {
-	if (ctx.from.id !== 1281463312) {
-		return null;
-	}
-	settings.addword(ctx);
-});
-
-// NOTA(RECKER): Listar palabras
-bot.command('wordlist', async ctx => {
-	settings.wordlist(ctx);
-});
-
-// NOTA(RECKER): Eliminar palabras
-bot.command('removeword', async ctx => {
-	if (ctx.from.id !== 1281463312) {
-		return null;
-	}
-	settings.removeword(ctx);
-});
-
-// NOTA(RECKER): Agregar golpe
-bot.command('addgolpe', async ctx => {
-	if (ctx.from.id !== 1281463312) {
-		return null;
-	}
-	settings.addgolpe(ctx);
-});
-
 // NOTA(RECKER): Listar golpess
 bot.command('golpelist', async ctx => {
 	settings.golpelist(ctx);
@@ -200,11 +194,6 @@ bot.command('removegolpe', async ctx => {
 		return null;
 	}
 	settings.removegolpe(ctx);
-});
-
-// NOTA(RECKER): CORE POINTS
-bot.on('message', async ctx => {
-	gameCore.main(ctx, double);
 });
 */
 

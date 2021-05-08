@@ -13,14 +13,18 @@ const buttons = Markup.inlineKeyboard([
 
 const start = async (ctx) => {
 	const command_list = [
-		{ command: '/start', description: 'Inicializar bot' },
 		{ command: '/install', description: 'Instala el bot en un chat' },
 		{ command: '/reset', description: 'Reinicia el score de todos los jugadores' },
+		{ command: '/help', description: 'Pide ayuda al bot' },
 		{ command: '/registrar', description: 'Registrate para poder comenzar a jugar' },
 		{ command: '/cuenta', description: 'Maneja diferentes opciones de tu cuenta' },
 		{ command: '/settings', description: 'Configuraciones del sistema' },
 		{ command: '/wordlist', description: 'Lista de palabras disponibles' },
 		{ command: '/stats', description: 'Ve tus stats' },
+		{ command: '/top', description: 'Ve los 5 mejores jugadores de esta season' },
+		{ command: '/topseason', description: 'Ve el mejor de cada season' },
+		{ command: '/fire', description: 'Multiplica la XP' },
+		{ command: '/duelo', description: 'Es hora de un dududdududdudu DUELO' },
 	];
 	
 	const client = new Client({
@@ -77,6 +81,7 @@ const start = async (ctx) => {
 Has iniciado el bot, con estos comandos puedes dar tus primeros pasos de configuración:
 /install - Instala el bot en un chat
 /settings - Configura el sistema
+/fire - Agrega un multiplicador de xp
 /reset - Reinicia scores y comienza una nueva season`, {
 		reply_markup: buttons.reply_markup,
 	});

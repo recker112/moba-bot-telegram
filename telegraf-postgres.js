@@ -3,7 +3,7 @@ const { Client } = require('pg');
 
 let sessions = {};
 
-class PostgressSession {
+class PostgresSession {
 	constructor (options) {
 		this.options = Object.assign({
 			property: 'session',
@@ -24,8 +24,8 @@ class PostgressSession {
 		return `${chat_id}:${ctx.from.id}`
 	}
 	
-	getSessionPostgres (key) {
-		if (sessions[key]) return { then: function (fn) { fn(sessions[key]) } };
+	getSessionPostgres (key, cached = true) {
+		if (sessions[key] && cached) return { then: function (fn) { fn(sessions[key]) } };
 		
 		const client = new Client(this.options);
 		client.connect();
@@ -60,20 +60,16 @@ class PostgressSession {
 		if (!session || Object.keys(session).length === 0) {
 			return client.query(`DELETE FROM postgress_sessions WHERE id='${key}'`).then(()=>{
 				client.end();
-			}).catch(()=>{
+			}).catch((e) => {
 				client.end();
 			});
 		}
 
 		const sessionString = JSON.stringify(session);
-		return client.query(`INSERT INTO postgress_sessions (id,session) VALUES ('${key}','${sessionString}') ON CONFLICT (id) DO UPDATE SET session = '${sessionString}'`).then(async () => {
+		return client.query(`INSERT INTO postgress_sessions (id,session) VALUES ('${key}','${sessionString}') ON CONFLICT (id) DO UPDATE SET session = '${sessionString}'`).then(() => {
 			//console.log('CERRANDO');
-			client.end();
-			await this.client.end();
-		}).catch((e) => {
-			//console.log('Error save in prostgres', e);
-			client.end();
-		});
+			return client.end();
+		})
 	}
 	
 	middleware() {
@@ -94,4 +90,4 @@ class PostgressSession {
 	}
 }
 
-module.exports = PostgressSession;
+module.exports = PostgresSession;

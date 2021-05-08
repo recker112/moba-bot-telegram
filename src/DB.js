@@ -138,6 +138,14 @@ const start_db = async () => {
 	
 	await client.query(sql);
 	
+	// NOTA(RECKER): Top season
+	sql = `CREATE TABLE IF NOT EXISTS top_season (
+		ID SERIAL,
+		user_id INT NULL
+	);`
+	
+	await client.query(sql);
+	
 	await client.end();
 	console.log('DB instalada!');
 }
@@ -154,8 +162,24 @@ const down_db = async () => {
 	
 	console.log('Reiniciando db...');
 	
+	// NOTA(RECKER): Obtener top season
+	let sql = 'SELECT user_id FROM experiences ORDER BY points DESC LIMIT 1';
+	
+	let user = await client.query(sql);
+	user = user.rows[0];
+	
+	if (user) {
+		sql = 'INSERT INTO top_season (user_id) VALUES ($1)';
+		
+		await client.query(sql, [user.user_id]);
+	}else {
+		sql = 'INSERT INTO top_season (user_id) VALUES (NULL)';
+		
+		await client.query(sql);
+	}
+	
 	// NOTA(RECKER): Tabla experiences
-	let sql = 'DROP TABLE IF EXISTS experiences, effects, debuffs, fights, postgress_sessions';
+	sql = 'DROP TABLE IF EXISTS experiences, effects, debuffs, fights, postgress_sessions';
 	
 	await client.query(sql);
 	
