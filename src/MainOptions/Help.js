@@ -13,10 +13,11 @@ Estos son los comandos disponibles actualmente
 /registrar - Crea una cuenta para poder jugar
 /cuenta - Ve diferentes acciones que puedes realizar con tu cuenta
 /wordlist - Ve la lista de todas las palabras disponibles
+/golpelist - Ve la lista de todos los golpes disponibles
 /stats - Ve tus estadísticas, debufos y más
 /top - Ve el TOP 5 jugadores de esta season
 /topseason - Ve los ganadores de cada season
-/duelo - Es hora de un dududududdudududud DUELO
+/pelea - Es hora de un dududududdudududud DUELO
 
 *¿CÓMO JUGAR?*
 Simplemente escribe un mensaje y ya estarás jugando. La *Agresividad* sube cuando usas alguna de las palabras registradas como *AGRESIVAS*, lo mismo para con la *Cariñosidad*. Al utilizar estas palabras recibiras un x2 de puntos.
