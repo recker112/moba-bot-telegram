@@ -13,22 +13,15 @@ const controlXP = require('./src/Core/ControlXP');
 const controlConfig = require('./src/Core/ControlConfigs');
 const controlWords = require('./src/Core/ControlWords');
 const wordList = require('./src/Core/WordList');
+const controlGolpes = require('./src/Core/ControlGolpes');
+const golpeList = require('./src/Core/GolpeList');
+const pelea = require('./src/Games/Pelea');
 const stats = require('./src/AccountOptions/Stats');
 const invertXP = require('./src/AccountOptions/InvertXP');
 const top = require('./src/Core/Top');
 const topSeason = require('./src/Core/TopSeason');
 const cprendio = require('./src/Core/CPrendio');
-const duelo = require('./src/Games/Duelo');
-const unirseDuelo = require('./src/Games/Duelo/Unirse');
-const closeGame = require('./src/CloseGame');
-
 const resetOptions = require('./src/MainOptions/Reset');
-const mainOptions = require('./src/MainOptions');
-const accountOptions = require('./src/AccountOptions');
-///const settings = require('./src/Settings');
-const gameOptions = require('./src/GameOptions');
-const gameCore = require('./src/GameCore');
-const fight = require('./src/Fight');
 
 // NOTA(RECKER): Iniciar variables
 const dotenv = require('dotenv');
@@ -89,11 +82,20 @@ bot.action(['settings_config', 'settings_vida_base', 'settings_damage_base', 'se
 // NOTA(RECKER): Control de palabras
 bot.action(['settings_words', 'settings_addword_1', 'settings_addword_2', 'settings_removeword'], controlWords);
 
+// NOTA(RECKER): Control de golpes
+bot.action(['settings_golpes', 'settings_addgolpe', 'settings_removegolpe'], controlGolpes);
+
+// NOTA(RECKER): Ver lista de golpes
+bot.command('golpelist', golpeList.main);
+
 // NOTA(RECKER): Ver lista de palabras
 bot.command('wordlist', wordList.main);
 
 // NOTA(RECKER): Ver otra lista de palabras
 bot.action(['list_words1', 'list_words2'], wordList.main);
+
+// NOTA(RECKER): PELEA
+bot.command('pelea', pelea.main);
 
 // NOTA(RECKER): Registrar cuenta
 bot.command('registrar', registrar);
@@ -125,76 +127,14 @@ bot.command('topseason', topSeason);
 // NOTA(RECKER): C prendio
 bot.command('fire', cprendio);
 
-// NOTA(RECKER): DUDUDUDUUDUDUDDU DUELO
-bot.command('duelo', duelo)
-
-// NOTA(RECKER): Duelo CORE
-bot.action('game_duelo_unir', unirseDuelo);
-
 // NOTA(RECKER): Regresar
 bot.action('returns', returns);
 
 // NOTA(RECKER): Cerrar mensaje
 bot.action('close', close);
 
-// NOTA(RECKER): Cerrar game
-bot.action('close_game', closeGame);
-
 bot.on('text', gameText.main);
 
 bot.on('message', gameOthers);
-/*
-
-/*
-// NOTA(RECKER): Prender el carro manual
-bot.command('c_prendio', async ctx => {
-	gameOptions.c_prendio(ctx, double);
-});
-
-// NOTA(RECKER): Update
-bot.command('cuenta', async ctx => {
-	accountOptions.cuenta(ctx);
-});
-
-// NOTA(RECKER): Pelea
-bot.command('pelea', async (ctx) => {
-	fight.pelea(ctx, double);
-});
-
-// NOTA(RECKER): Ver stats
-bot.command('stats', async ctx => {
-	// NOTA(RECKER): Solo por mensaje privado
-	if (ctx.chat.type !== 'private') {
-		return null;
-	}
-	accountOptions.stats(ctx);
-});
-
-// NOTA(RECKER): Top
-bot.command('top', async ctx => {
-	gameOptions.top(ctx);
-});
-
-// NOTA(RECKER): Agregar palabras lite
-bot.command('addword_soft', async ctx => {
-	if (ctx.from.id !== 1281463312) {
-		return null;
-	}
-	settings.addword_soft(ctx);
-});
-
-// NOTA(RECKER): Listar golpess
-bot.command('golpelist', async ctx => {
-	settings.golpelist(ctx);
-});
-
-// NOTA(RECKER): Eliminar golpes
-bot.command('removegolpe', async ctx => {
-	if (ctx.from.id !== 1281463312) {
-		return null;
-	}
-	settings.removegolpe(ctx);
-});
-*/
 
 bot.launch();

@@ -1,8 +1,8 @@
 // NOTA(RECKER): Conectarse a la DB
 const { Client } = require('pg');
 
-const removeword_awaitResponse =  async (ctx) => {
-	let response = await ctx.reply(`Para eliminar una palabra del sistema use el siguiente formato:
+const addgolpe_awaitResponse =  async (ctx) => {
+	let response = await ctx.replyWithMarkdown(`Para agregar un *GOLPE* al sistema use el siguiente formato:
 
 palabra1
 palabra2
@@ -13,7 +13,7 @@ Para cancelar simplemente escriba /cancel.`);
 	let find = -1;
 	let session = ctx.session.awaitResponse;
 	if (session) {
-		find = ctx.session.awaitResponse.findIndex(({type}) => type === 'removeword');
+		find = ctx.session.awaitResponse.findIndex(({type}) => type === 'addgolpe');
 	}else {
 		ctx.session.awaitResponse = [];
 	}
@@ -22,7 +22,7 @@ Para cancelar simplemente escriba /cancel.`);
 	if (find > -1) {
 		const awaitResponse = ctx.session.awaitResponse[find];
 		ctx.session.awaitResponse[find] = {
-			type: 'removeword',
+			type: 'addgolpe',
 			message_remove: [
 				...awaitResponse.message_remove,
 				response.message_id,
@@ -33,17 +33,16 @@ Para cancelar simplemente escriba /cancel.`);
 		let length = typeof ctx.session.awaitResponse !== 'object' ? 0 : ctx.session.awaitResponse.length;
 		
 		ctx.session.awaitResponse[length] = {
-			type: 'removeword',
+			type: 'addgolpe',
 			message_remove: [
 				response.message_id,
 			],
 		}
 		ctx.session.awaitID = length;
 	}
-	
 }
 
-const removeword = async (ctx) => {
+const addgolpe = async (ctx) => {
 	// NOTA(RECKER): Obtener configs
 	const client = new Client({
 		connectionString: process.env.DATABASE_URL,
@@ -63,7 +62,7 @@ const removeword = async (ctx) => {
 	let text = ctx.message.text;
 	text = text.split('\n');
 	let querys = 0;
-	let deletes = 0;
+	let inserts = 0;
 	let remove_messages = [];
 	
 	// NOTA(RECKER): Verificar cancel
@@ -75,20 +74,22 @@ const removeword = async (ctx) => {
 	// NOTA(RECEKR): Recorrer texto
 	let i=0;
 	while (text[i]) {
+		if (cancel_user) {
+			break;
+		}
+		
 		let line = text[i];
 		line = line.trim();
+		let cancel = false;
 		
 		// NOTA(RECKER): Agregar palabra
 		try {
-			let sql = 'DELETE FROM words WHERE word=$1';
 			
+			let sql = 'INSERT INTO fight_golpes (golpe) VALUES ($1)';
+
 			const res = await client.query(sql, [line]);
 
-			if (!res.rowCount) {
-				throw new Error('No register');
-			}
-
-			deletes++;
+			inserts++;
 		}catch (e) {
 			// Nothing
 		}
@@ -100,30 +101,30 @@ const removeword = async (ctx) => {
 	let text_id = ctx.message.message_id;
 	let response;
 	if (!querys && !cancel_user) {
-		response = await ctx.reply(`Para eliminar una palabra del sistema use el siguiente formato:
+		response = await ctx.replyWithMarkdown(`Para una *GOLPE* al sistema use el siguiente formato:
 
 palabra1
 palabra2
 
 Para cancelar simplemente escriba /cancel.`);
-	}else if (querys && !deletes && !cancel_user) {
+	}else if (querys && !inserts && !cancel_user) {
 		response = await ctx.reply(`Ninguna de las lineas ingresadas se pudo procesar, es posible que esto se deba a los siguientes puntos:
 
 1) El formato no es correcto.
-2) No se encuentra en la base de datos.
+2) Ya existe en la base de datos.
 3) Problemas con el servidor.
 
 Si desea cancelar puede usar el comando /cancel.`);
-	}else if (querys > deletes && !cancel_user) {
-		response = await ctx.reply(`Algunas lineas fueron procesadas correctamente, los errores en las demás lineas se debe a:
+	}else if (querys > inserts && !cancel_user) {
+		response = await ctx.replyreplyWithMarkdown(`Algunas lineas fueron procesadas correctamente, los errores en las demás lineas se debe a:
 
 1) El formato no es correcto.
-2) No se encuentra en la base de datos.
+2) Ya existe en la base de datos.
 3) Problemas con el servidor.
 
 Si desea cancelar puede usar el comando /cancel.`);
-	} else if (querys && deletes && querys === deletes && !cancel_user) {
-		response = await ctx.replyWithMarkdown('Palabras eliminadas!');
+	} else if (querys && inserts && querys === inserts && !cancel_user) {
+		response = await ctx.replyWithMarkdown('Golpes agregados!');
 	} else {
 		response = await ctx.replyWithMarkdown('Acción cancelada!');
 	}
@@ -132,7 +133,7 @@ Si desea cancelar puede usar el comando /cancel.`);
 	remove_messages.push(text_id);
 	
 	let session = ctx.session.awaitResponse[ctx.session.awaitID];
-	if ((querys && deletes && querys === deletes) || cancel_user) {
+	if ((querys && inserts && querys === inserts) || cancel_user) {
 		// NOTA(RECKER): Eliminar session finalizada
 		setTimeout(() => {
 			ctx.deleteMessage(response.message_id);
@@ -152,7 +153,7 @@ Si desea cancelar puede usar el comando /cancel.`);
 		remove_messages.push(response.message_id);
 		
 		ctx.session.awaitResponse[ctx.session.awaitID] = {
-			type: 'removeword',
+			type: 'addgolpe',
 			message_remove: [
 				...session.message_remove,
 				...remove_messages,
@@ -164,6 +165,6 @@ Si desea cancelar puede usar el comando /cancel.`);
 }
 
 module.exports = {
-	removeword_awaitResponse,
-	removeword,
+	addgolpe_awaitResponse,
+	addgolpe,
 }

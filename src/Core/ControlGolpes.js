@@ -3,18 +3,16 @@ const { Client } = require('pg');
 
 const { init_state } = require('./Settings');
 const { Markup } = require('telegraf');
-const { addword1_awaitResponse } = require('./settings/AddWords1');
-const { addword2_awaitResponse } = require('./settings/AddWords2');
-const { removeword_awaitResponse } = require('./settings/RemoveWords');
+const { addgolpe_awaitResponse } = require('./settings/AddGolpe');
+const { removegolpe_awaitResponse } = require('./settings/RemoveGolpe');
 
 // NOTA(RECKER): Botones
 const buttons_controlConfig = Markup.inlineKeyboard([
 	[
-		Markup.button.callback('Agregar palabra agresiva', 'settings_addword_1'),
-		Markup.button.callback('Agregar palabra cariñosa', 'settings_addword_2'),
+		Markup.button.callback('Agregar golpe', 'settings_addgolpe'),
+		Markup.button.callback('Eliminar golpe', 'settings_removegolpe'),
 	],
 	[
-		Markup.button.callback('Eliminar palabras', 'settings_removeword'),
 		Markup.button.callback('Regresar', 'returns')
 	],
 ]);
@@ -36,21 +34,18 @@ const main = async (ctx) => {
 	let query = ctx.session.querys[found_id];
 	
 	// Verificar redirección
-	if (ctx.match[0] === 'settings_addword_1') {
-		await addword1_awaitResponse(ctx);
+	if (ctx.match[0] === 'settings_addgolpe') {
+		await addgolpe_awaitResponse(ctx);
 		return null;
-	}else if (ctx.match[0] === 'settings_addword_2') {
-		await addword2_awaitResponse(ctx);
-		return null;
-	}else if (ctx.match[0] === 'settings_removeword') {
-		await removeword_awaitResponse(ctx);
+	}else if (ctx.match[0] === 'settings_removegolpe') {
+		await removegolpe_awaitResponse(ctx);
 		return null;
 	}
 	
 	init_state.text = `MOBA RANK ${process.env.VERSION}
 Estas son las configuraciones disponibles para el sistema`;
 	
-	let response = await ctx.editMessageText('Aquí podrás controlar las palabras usadas en el sistema, simplemente eliga la opción que desea realizar.', {
+	let response = await ctx.editMessageText('Aquí podrás controlar los golpes usados en el sistema, simplemente eliga la opción que desea realizar.', {
 		reply_markup: buttons_controlConfig.reply_markup,
 	});
 	

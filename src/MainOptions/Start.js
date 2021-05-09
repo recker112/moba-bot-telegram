@@ -24,7 +24,8 @@ const start = async (ctx) => {
 		{ command: '/top', description: 'Ve los 5 mejores jugadores de esta season' },
 		{ command: '/topseason', description: 'Ve el mejor de cada season' },
 		{ command: '/fire', description: 'Multiplica la XP' },
-		{ command: '/duelo', description: 'Es hora de un dududdududdudu DUELO' },
+		{ command: '/pelea', description: 'Pelea contra otro jugador' },
+		{ command: '/golpelist', description: 'Lista de golpes disponibles' },
 	];
 	
 	const client = new Client({

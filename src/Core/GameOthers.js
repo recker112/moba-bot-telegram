@@ -1,6 +1,8 @@
 // NOTA(RECKER): Conectarse a la DB
 const { Client } = require('pg');
 
+const { calculate_level } = require('./settings/AddXP');
+
 const gameOthers = async (ctx) => {
 	// NOTA(RECKER): Obtener datos de la db
 	const client = new Client({
@@ -76,7 +78,8 @@ WHERE user_id=$1 AND expired_at > now() :: timestamp AND type = 'xp_debuff'`;
 	
 	// NOTA(RECKER): Aumentar nivel
 	if (user_data.points >= (user_data.level * config.xp_need)) {
-		user_data.level++;
+		let levels = calculate_level(user_data.points, config.xp_need);
+		user_data.level = levels;
 	}
 	
 	// NOTA(RECKER): Actualizar datos

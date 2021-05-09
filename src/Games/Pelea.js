@@ -1,18 +1,20 @@
 // NOTA(RECKER): Conectarse a la DB
 const { Client } = require('pg');
 
+const { calculate_level } = require('../Core/settings/AddXP');
+
 function getRandomInt(min, max) {
   return Math.round(Math.random() * (max - min)) + min;
 }
 
-const pelea = async (ctx, double) => {
+const main = async (ctx, double) => {
 	// NOTA(RECKER): Validar mencion
 	if (ctx.message.entities.length !== 2) {
 		let response = await ctx.replyWithMarkdown('Debe de mencionar a un usuario\nEJ: /pelea @usuario');
 		setTimeout(() => {
 			ctx.deleteMessage(response.message_id);
 			ctx.deleteMessage(ctx.message_id || ctx.message.message_id);
-		}, 5000);
+		}, 4000);
 		return null;
 	}
 	
@@ -21,7 +23,7 @@ const pelea = async (ctx, double) => {
 		setTimeout(() => {
 			ctx.deleteMessage(response.message_id);
 			ctx.deleteMessage(ctx.message_id || ctx.message.message_id);
-		}, 5000);
+		}, 4000);
 		return null;
 	}
 	const offset = ctx.message.entities[1].offset;
@@ -48,7 +50,7 @@ const pelea = async (ctx, double) => {
 	
 	await client.connect();
 	
-	let sql = 'SELECT * FROM config WHERE id=1';
+	let sql = 'SELECT * FROM configs WHERE id=1';
 	
 	let config = await client.query(sql);
 	config = config.rows[0];
@@ -71,8 +73,9 @@ const pelea = async (ctx, double) => {
 	}
 	
 	// NOTA(RECKER): Obtener jugador 1
-	sql = `SELECT users.*, experiences.* FROM users
+	sql = `SELECT * FROM users
 INNER JOIN experiences ON users.id = experiences.user_id
+INNER JOIN effects ON effects.user_id = users.id
 WHERE users.id=$1`;
 	
 	let user1 = await client.query(sql, [ctx.from.id]);
@@ -89,9 +92,32 @@ WHERE users.id=$1`;
 		return null;
 	}
 	
+	// NOTA(RECKER): Obtener debuffs
+	sql = `SELECT type, amount FROM debuffs
+WHERE user_id=$1 AND expired_at > now() :: timestamp`;
+	
+	let debuffs = await client.query(sql,[ctx.from.id]);
+	debuffs = debuffs.rows;
+	
+	// NOTA(RECKER): Asignar debuff
+	let stats1 = {
+		vida_debuff: 0,
+		damage_debuff: 0,
+	};
+	
+	debuffs.map((debuff) => {
+		let keys = Object.keys(stats1);
+		keys.map((key) => {
+			if (debuff.type === key) {
+				stats1[key] = stats1[key] >= 75 ? 75 : stats1[key] + debuff.amount;
+			}
+		});
+	});
+	
 	// NOTA(RECKER): Obtener jugador 2
-	sql = `SELECT users.*, experiences.* FROM users
+	sql = `SELECT * FROM users
 INNER JOIN experiences ON users.id = experiences.user_id
+INNER JOIN effects ON effects.user_id = users.id
 WHERE users.username=$1`;
 	
 	let user2 = await client.query(sql, [username.slice(1)]);
@@ -108,17 +134,48 @@ WHERE users.username=$1`;
 		return null;
 	}
 	
+	// NOTA(RECKER): Obtener debuffs
+	sql = `SELECT type, amount FROM debuffs
+WHERE user_id=$1 AND expired_at > now() :: timestamp`;
+	
+	debuffs = await client.query(sql,[user2.user_id]);
+	debuffs = debuffs.rows;
+	
+	// NOTA(RECKER): Asignar debuff
+	let stats2 = {
+		vida_debuff: 0,
+		damage_debuff: 0,
+	};
+	
+	debuffs.map((debuff) => {
+		let keys = Object.keys(stats2);
+		keys.map((key) => {
+			if (debuff.type === key) {
+				stats2[key] = stats2[key] >= 75 ? 75 : stats2[key] + debuff.amount;
+			}
+		});
+	});
+	
 	// NOTA(RECKER): Preparar usuarios con sus stats
 	let users = [user1, user2];
-	users = users.map((user) => {
-		const aggressiveness = Math.round10(user.aggressiveness, -2);
-		const pato = Math.round10(user.pateria, -2);
+	users = users.map((user, i) => {
+		let debuff_add;
+		
+		if (i === 0) {
+			debuff_add = stats1;
+		}else {
+			debuff_add = stats2;
+		}
+		
+		// NOTA(RECKER): Calculos
+		let damage_base = config.damage_base * user.level;
+		damage_base = damage_base - ((damage_base * debuff_add.damage_debuff) / 100);
+		let vida_base = config.vida_base * user.level;
+		vida_base = vida_base - ((vida_base * debuff_add.vida_debuff) / 100);
 
-		const damage_base = config.damage_base * user.level;
-		const vida_base = config.vida_base * user.level;
-		let damage = damage_base + ((damage_base * aggressiveness) / 100);
-		damage = damage > 0 ? Math.round10(damage, -2) : 0;
-		let vida = vida_base - ((vida_base * pato) / 100);
+		let damage = damage_base + ((damage_base * user.aggressiveness) / 100);
+		damage = Math.round10(damage, -2);
+		let vida = vida_base - ((vida_base * user.smoothness) / 100) || 0;
 		vida = vida > 0 ? Math.round10(vida, -2) : 0;
 		
 		user.vida = vida;
@@ -133,13 +190,13 @@ WHERE users.username=$1`;
 	
 	let round = 1;
 	while(users[0].vida > 0 && users[1].vida > 0) {
-		const randomNumber = getRandomInt(0,9);
+		const randomNumber = getRandomInt(0,99);
 		const randomNumberText = getRandomInt(0,golpes_type.length - 1);
 		
 		// NOTA(RECKER): Seleccionar usuarios
 		let user_attack;
 		let user_recived;
-		if (randomNumber > 4) {
+		if (randomNumber > 49) {
 			user_attack = users[0];
 			user_recived = users[1];
 		}else {
@@ -158,63 +215,68 @@ WHERE users.username=$1`;
 	// NOTA(RECKER): Mensajes especiales
 	if ((users[0].vida <= 0 || users[1].vida <= 0) && round === 1) {
 		// NOTA(RECKER): No vida
-		fight_log += '\n*El oponente no tiene vida suficiente para una batalla*';
+		fight_log += '*Alguno de los jugadores no tienen vida suficiente para una batalla*';
 	}else if ((users[0].vida <= 0 || users[1].vida <= 0) && round === 2) {
 		// NOTA(RECKER): No vida
 		fight_log += '\n*DELETEADO PAPÁ*';
 	}
 	
+	// NOTA(RECKER): Asignar ganador
 	let user_win;
 	let user_lose;
-	if (users[0].vida > 0) {
+	if (users[0].vida > 0 && users[1].vida <= 0) {
 		user_win = users[0];
 		user_lose = users[1];
-	} else {
+	} else if (users[1].vida > 0 && users[0].vida <= 0) {
 		user_win = users[1];
 		user_lose = users[0];
+	}else {
+		user_win=null;
+		user_lose=null;
 	}
 	
-	fight_log += `\n\n*¡@${user_win.username} ganó la batalla!*`;
+	if (user_win) {
+		fight_log += `\n\n*¡@${user_win.username} ganó la batalla!*`;
+		
+			// NOTA(RECKER): Registrar batalla
+		sql = `INSERT INTO fights (user_win,user_lose) VALUES ($1,$2)`;
+
+		await client.query(sql, [user_win.user_id,user_lose.user_id]);
+		
+		// NOTA(RECKER): Agregar xp al winner
+		user_win.points += 10 * config.double_exp;
+		// NOTA(RECKER): Aumentar nivel
+		if (user_win.points >= (user_win.level * config.xp_need)) {
+			let levels = calculate_level(user_win.points, config.xp_need);
+			user_win.level = levels;
+		}
+		
+		sql = 'UPDATE experiences SET points=$1, level=$2 WHERE user_id=$3';
+		
+		await client.query(sql, [user_win.points, user_win.level, user_win.user_id]);
+		
+		// NOTA(RECKER): Agregar efectos al winner
+		sql = `UPDATE effects SET aggressiveness=CASE WHEN aggressiveness > 15 THEN aggressiveness - 15 ELSE 0 END, smoothness=CASE WHEN smoothness < 110 THEN smoothness + 30 ELSE 110 END WHERE user_id=$1`;
 	
+		await client.query(sql,[user_win.user_id]);
+		
+		// NOTA(RECKER): Agregar agresividad al perdedor
+		sql = 'UPDATE effects SET aggressiveness=aggressiveness+20 WHERE user_id=$1';
+
+		await client.query(sql, [user_lose.user_id]);
+	}else {
+		fight_log += `\n\n*¡Nadie ganó la batalla!*`;
+	}
+	
+	// NOTA(RECKER): Eliminar mensaje del usuario
+	ctx.deleteMessage(ctx.message_id || ctx.message.message_id);
+	
+	// NOTA(RECKER): Enviar resultado
 	ctx.replyWithMarkdown(fight_log);
 	
-	// NOTA(RECKER): Registrar batalla
-	sql = `INSERT INTO fights (user_win,user_lose) VALUES ($1,$2)`;
-	
-	await client.query(sql, [user_win.user_id,user_lose.user_id]);
-	
-	// NOTA(RECKER): Agregar xp al winner
-	user_win.points += 5 * (config.double_exp ? double : 1);
-	sql = `UPDATE experiences
-		SET points=$1, aggressiveness=CASE WHEN aggressiveness > 10 THEN aggressiveness - 10 ELSE 0 END, pateria=pateria+15
-		WHERE user_id=$2`;
-	
-	await client.query(sql, [user_win.points,user_win.user_id]);
-	
-	// NOTA(RECKER): Agregar agresividad al perdedor
-	sql = `UPDATE experiences
-		SET aggressiveness=aggressiveness+20
-		WHERE user_id=$1`;
-	
-	await client.query(sql, [user_lose.user_id]);
-	
-	// NOTA(RECKER): Aumentar nivel
-	if (user_win.points >= (user_win.level * config.xp_need)) {
-		user_win.level++;
-		sql = `UPDATE experiences
-		SET level=${user_win.level}
-		WHERE user_id=$1`;
-		
-		await client.query(sql,[user_win.user_id]);
-	}
-	
-	setTimeout(() => {
-		ctx.deleteMessage(ctx.message_id || ctx.message.message_id);
-	}, 5000);
-	
-	await client.end();
+	client.end();
 }
 
 module.exports = {
-	pelea
+	main
 };

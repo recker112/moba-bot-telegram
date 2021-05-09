@@ -1,5 +1,6 @@
 // NOTA(RECKER): Conectarse a la DB
 const { Client } = require('pg');
+const { calculate_level } = require('./settings/AddXP');
 
 const { removexp } = require('./settings/RemoveXP');
 const { addxp } = require('./settings/AddXP');
@@ -11,6 +12,8 @@ const { smoothness } = require('./settings/Smoothness');
 const { addword1 } = require('./settings/AddWords1');
 const { addword2 } = require('./settings/AddWords2');
 const { removeword } = require('./settings/RemoveWords');
+const { addgolpe } = require('./settings/AddGolpe');
+const { removegolpe } = require('./settings/RemoveGolpe');
 const { xp_debuff } = require('../AccountOptions/invert_xp/XP');
 const { vida_debuff } = require('../AccountOptions/invert_xp/Vida');
 const { damage_debuff } = require('../AccountOptions/invert_xp/Damage');
@@ -65,6 +68,14 @@ const awaitResponse = async (ctx) => {
 			
 		case 'removeword':
 			await removeword(ctx);
+			break;
+			
+		case 'addgolpe':
+			await addgolpe(ctx);
+			break;
+			
+		case 'removegolpe':
+			await removegolpe(ctx);
 			break;
 			
 		case 'xp_debuff':
@@ -237,7 +248,7 @@ WHERE user_id=$1 AND expired_at > now() :: timestamp`;
 		smooth_match = text.match(reg2) ? text.match(reg2).length : 0;
 	}
 	
-	// NOTA(RECKER): Suma de xp y effectos
+	// NOTA(RECKER): Combos de effectos
 	aggress_match = aggress_match > 10 ? 10 : aggress_match;
 	const aggress_combo = aggress_match >= 2 ? (config.aggressiveness_aggregate * aggress_match) / 75 : 0;
 	let aggress_aggregate = config.aggressiveness_aggregate + aggress_combo;
@@ -262,8 +273,8 @@ WHERE user_id=$1 AND expired_at > now() :: timestamp`;
 	addxp_messages += smooth_match > 0 ? (config.points_base * 2) * config.double_exp : 0;
 	// NOTA(RECKER): Agregar palabras
 	user_data.blushed += smooth_match;
-	// NOTA(RECKER): No pasar de 75 la cariñosidad
-	user_data.smoothness = user_data.smoothness <= 75 ? user_data.smoothness : 75;
+	// NOTA(RECKER): No pasar de 110 la cariñosidad
+	user_data.smoothness = user_data.smoothness <= 110 ? user_data.smoothness : 110;
 	
 	// NOTA(RECKER): Descontar efectos si no se ha dicho nada
 	user_data.aggressiveness -= (aggress_match === 0) ? config.aggressiveness_discount : 0;
@@ -281,7 +292,8 @@ WHERE user_id=$1 AND expired_at > now() :: timestamp`;
 	
 	// NOTA(RECKER): Aumentar nivel
 	if (user_data.points >= (user_data.level * config.xp_need)) {
-		user_data.level++;
+		let levels = calculate_level(user_data.points, config.xp_need);
+		user_data.level = levels;
 	}
 	
 	// NOTA(RECKER): Actualizar datos

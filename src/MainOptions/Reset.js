@@ -92,7 +92,6 @@ const confirm_reset = async (ctx) => {
 		return null;
 	}
 	
-	
 	await down_db();
 	
 	await start_db();
@@ -111,7 +110,7 @@ const confirm_reset = async (ctx) => {
 	
 	ctx.session.querys = copy;
 	
-	ctx.reply('Puntos reiniciados!');
+	ctx.reply('Puntos reiniciados.\n¡Nueva season comenzada!');
 }
 
 module.exports = {

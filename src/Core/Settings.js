@@ -10,10 +10,10 @@ const buttons_init = Markup.inlineKeyboard([
 		Markup.button.callback('Configuraciones', 'settings_config'),
 	],
 	[
-		Markup.button.callback('Eliminar datos sin uso', 'settings_datos'),
 		Markup.button.callback('Configurar palabras', 'settings_words'),
+		Markup.button.callback('Configurar golpes', 'settings_golpes'),
 	],
-	[Markup.button.callback('Cerrar', 'close')],
+	[Markup.button.callback('Cerrar', 'close'),]
 ]);
 
 let init_state = {

@@ -86,7 +86,7 @@ const start_db = async () => {
 		points_base FLOAT DEFAULT 1,
 		vida_base FLOAT DEFAULT 20,
 		damage_base FLOAT DEFAULT 5,
-		xp_need FLOAT DEFAULT 75,
+		xp_need FLOAT DEFAULT 115,
 		smoothness_discount FLOAT DEFAULT 2.5,
 		aggressiveness_discount FLOAT DEFAULT 4.5,
 		smoothness_aggregate FLOAT DEFAULT 5,

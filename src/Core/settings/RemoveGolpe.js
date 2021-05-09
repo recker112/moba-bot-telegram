@@ -1,8 +1,8 @@
 // NOTA(RECKER): Conectarse a la DB
 const { Client } = require('pg');
 
-const removeword_awaitResponse =  async (ctx) => {
-	let response = await ctx.reply(`Para eliminar una palabra del sistema use el siguiente formato:
+const removegolpe_awaitResponse =  async (ctx) => {
+	let response = await ctx.reply(`Para eliminar un golpe del sistema use el siguiente formato:
 
 palabra1
 palabra2
@@ -13,7 +13,7 @@ Para cancelar simplemente escriba /cancel.`);
 	let find = -1;
 	let session = ctx.session.awaitResponse;
 	if (session) {
-		find = ctx.session.awaitResponse.findIndex(({type}) => type === 'removeword');
+		find = ctx.session.awaitResponse.findIndex(({type}) => type === 'removegolpe');
 	}else {
 		ctx.session.awaitResponse = [];
 	}
@@ -22,7 +22,7 @@ Para cancelar simplemente escriba /cancel.`);
 	if (find > -1) {
 		const awaitResponse = ctx.session.awaitResponse[find];
 		ctx.session.awaitResponse[find] = {
-			type: 'removeword',
+			type: 'removegolpe',
 			message_remove: [
 				...awaitResponse.message_remove,
 				response.message_id,
@@ -33,7 +33,7 @@ Para cancelar simplemente escriba /cancel.`);
 		let length = typeof ctx.session.awaitResponse !== 'object' ? 0 : ctx.session.awaitResponse.length;
 		
 		ctx.session.awaitResponse[length] = {
-			type: 'removeword',
+			type: 'removegolpe',
 			message_remove: [
 				response.message_id,
 			],
@@ -43,7 +43,7 @@ Para cancelar simplemente escriba /cancel.`);
 	
 }
 
-const removeword = async (ctx) => {
+const removegolpe = async (ctx) => {
 	// NOTA(RECKER): Obtener configs
 	const client = new Client({
 		connectionString: process.env.DATABASE_URL,
@@ -80,7 +80,7 @@ const removeword = async (ctx) => {
 		
 		// NOTA(RECKER): Agregar palabra
 		try {
-			let sql = 'DELETE FROM words WHERE word=$1';
+			let sql = 'DELETE FROM fight_golpes WHERE golpe=$1';
 			
 			const res = await client.query(sql, [line]);
 
@@ -100,7 +100,7 @@ const removeword = async (ctx) => {
 	let text_id = ctx.message.message_id;
 	let response;
 	if (!querys && !cancel_user) {
-		response = await ctx.reply(`Para eliminar una palabra del sistema use el siguiente formato:
+		response = await ctx.reply(`Para eliminar un golpe del sistema use el siguiente formato:
 
 palabra1
 palabra2
@@ -152,7 +152,7 @@ Si desea cancelar puede usar el comando /cancel.`);
 		remove_messages.push(response.message_id);
 		
 		ctx.session.awaitResponse[ctx.session.awaitID] = {
-			type: 'removeword',
+			type: 'removegolpe',
 			message_remove: [
 				...session.message_remove,
 				...remove_messages,
@@ -164,6 +164,6 @@ Si desea cancelar puede usar el comando /cancel.`);
 }
 
 module.exports = {
-	removeword_awaitResponse,
-	removeword,
+	removegolpe_awaitResponse,
+	removegolpe,
 }

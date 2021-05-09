@@ -61,8 +61,6 @@ WHERE user_id=$1 AND expired_at > now() :: timestamp`;
 	let debuffs = await client.query(sql,[ctx.from.id]);
 	debuffs = debuffs.rows;
 	
-	client.end();
-	
 	// NOTA(RECKER): Obtener debuff
 	let stats = {
 		vida_debuff: 0,
@@ -89,6 +87,16 @@ WHERE user_id=$1 AND expired_at > now() :: timestamp`;
 		return null;
 	}
 	
+	// NOTA(RECKER): Obtener batallas
+	sql = `SELECT count(user_win) as count FROM fights WHERE user_win=$1`;
+	let wins = await client.query(sql,[ctx.from.id]);
+	wins = wins.rows[0];
+	sql = `SELECT count(user_lose) as count FROM fights WHERE user_lose=$1`;
+	let loses = await client.query(sql,[ctx.from.id]);
+	loses = loses.rows[0];
+	
+	client.end();
+	
 	// NOTA(RECKER): Calculos
 	let damage_base = config.damage_base * user.level;
 	damage_base = damage_base - ((damage_base * stats.damage_debuff) / 100);
@@ -114,7 +122,11 @@ Palabras cariñosas: ${user.blushed}
 
 ESTADOS:
 Agresividad: ${user.aggressiveness}%
-Cariñosidad: ${user.smoothness}%`;
+Cariñosidad: ${user.smoothness}%
+
+PELEAS:
+Ganadas: ${wins.count}
+Perdidas: ${loses.count}`;
 	
 	let response = await ctx.replyWithMarkdown(init_state.text, {
 		reply_markup: init_state.buttons.reply_markup,
@@ -177,8 +189,6 @@ WHERE user_id=$1 AND expired_at > now() :: timestamp`;
 	let debuffs = await client.query(sql,[ctx.from.id]);
 	debuffs = debuffs.rows;
 	
-	client.end();
-	
 	// NOTA(RECKER): Obtener debuff
 	let stats = {
 		vida_debuff: 0,
@@ -193,6 +203,14 @@ WHERE user_id=$1 AND expired_at > now() :: timestamp`;
 			}
 		});
 	});
+	
+	// NOTA(RECKER): Obtener batallas
+	sql = `SELECT count(user_win) as count FROM fights WHERE user_win=$1`;
+	let wins = await client.query(sql,[ctx.from.id]);
+	wins = wins.rows[0];
+	sql = `SELECT count(user_lose) as count FROM fights WHERE user_lose=$1`;
+	let loses = await client.query(sql,[ctx.from.id]);
+	loses = loses.rows[0];
 	
 	client.end();
 	
@@ -221,7 +239,11 @@ Palabras cariñosas: ${user.blushed}
 
 ESTADOS:
 Agresividad: ${user.aggressiveness}%
-Cariñosidad: ${user.smoothness}%`;
+Cariñosidad: ${user.smoothness}%
+
+PELEAS:
+Ganadas: ${wins.count}
+Perdidas: ${loses.count}`;
 	
 	try {
 		let response = await ctx.editMessageText(init_state.text, {
