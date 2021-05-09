@@ -88,6 +88,10 @@ ORDER BY experiences.points DESC LIMIT 1`;
 		});
 	}
 	
+	sql = `SELECT count(user_win) as count FROM fights WHERE user_win=$1`;
+	let wins = await client.query(sql,[ctx.from.id]);
+	wins = wins.rows[0];
+	
 	client.end();
 	
 	init_state.text = 'TOP 1:';
@@ -114,6 +118,7 @@ Daño: ${damage}
 Vida: ${vida}
 Palabras agresivas: ${user.insults}
 Palabras cariñosas: ${user.blushed}
+Peleas ganadas: ${wins.count}
 
 ESTADOS:
 Agresividad: ${user.aggressiveness}%
@@ -202,6 +207,10 @@ ORDER BY points DESC LIMIT 1 OFFSET ${offset}`;
 		});
 	}
 	
+	sql = `SELECT count(user_win) as count FROM fights WHERE user_win=$1`;
+	let wins = await client.query(sql,[ctx.from.id]);
+	wins = wins.rows[0];
+	
 	client.end();
 	
 	init_state.text = `TOP ${offset + 1}:`;
@@ -228,6 +237,7 @@ Daño: ${damage}
 Vida: ${vida}
 Palabras agresivas: ${user.insults}
 Palabras cariñosas: ${user.blushed}
+Peleas ganadas: ${wins.count}
 
 ESTADOS:
 Agresividad: ${user.aggressiveness}%
