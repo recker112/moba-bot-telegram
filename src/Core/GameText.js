@@ -257,18 +257,18 @@ WHERE user_id=$1 AND expired_at > now() :: timestamp`;
 	let addxp_messages = 0;
 	
 	// NOTA(RECKER): Agregar agresividad si está mencionando o respondiento
-	user_data.aggressiveness += (findMention || findReply) ? aggress_aggregate * 1.5 : 0;
+	user_data.aggressiveness += ((findMention || findReply) && aggress_match > 0) ? aggress_aggregate * 1.5 : 0;
 	// NOTA(RECKER): Agregar agresividad si solamente dijo la palabra
-	user_data.aggressiveness += (!findMention && !findReply) && aggress_match > 0 ? aggress_aggregate : 0;
+	user_data.aggressiveness += ((!findMention && !findReply) && aggress_match > 0) ? aggress_aggregate : 0;
 	// NOTA(RECKER): Agregar xp agresividad
 	addxp_messages += aggress_match > 0 ? (config.points_base * 2) * config.double_exp : 0;
 	// NOTA(RECKER): Agregar palabras
 	user_data.insults += aggress_match;
 	
 	// NOTA(RECKER): Agregar cariñosidad si está mencionando o respondiento
-	user_data.smoothness += (findMention || findReply) ? Math.round10(smooth_aggregate * 1.6, -2) : 0;
+	user_data.smoothness += ((findMention || findReply) && smooth_match > 0) ? Math.round10(smooth_aggregate * 1.6, -2) : 0;
 	// NOTA(RECKER): Agregar cariñosidad si solamente dijo la palabra
-	user_data.smoothness += (!findMention && !findReply) && smooth_match > 0 ? Math.round10(smooth_aggregate, -2) : 0;
+	user_data.smoothness += ((!findMention && !findReply) && smooth_match > 0) ? Math.round10(smooth_aggregate, -2) : 0;
 	// NOTA(RECKER): Agregar xp cariñosidad
 	addxp_messages += smooth_match > 0 ? (config.points_base * 2) * config.double_exp : 0;
 	// NOTA(RECKER): Agregar palabras
