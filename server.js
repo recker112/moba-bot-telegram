@@ -5,9 +5,9 @@ dotenv.config();
 const express = require('express');
 const app = express();
 const port = process.env.PORT || 3000;
-require('./bot.js');
 
 app.get('/', (req, res) => {
+	require('./bot.js');
 	res.sendFile('test.html', {root: __dirname })
 })
 
