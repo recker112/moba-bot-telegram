@@ -33,7 +33,7 @@ require('./src/DB');
 require('./src/parseCeil');
 
 const { Telegraf, Markup } = require('telegraf');
-const PostgresSession = require('./telegraf-postgres');
+const PostgresSession = require('telegraf-postgres-session')
 
 // NOTA(RECKER): Conectarse a la DB
 const { Client } = require('pg');
