@@ -287,7 +287,7 @@ WHERE user_id=$1 AND expired_at > now() :: timestamp`;
 	
 	// NOTA(RECKER): Agregar xp base
 	addxp_messages += config.points_base * config.double_exp;
-	user_data.points += addxp_messages - (debuffs_actives.xp_debuff * addxp_messages) / 100 || 0;
+	user_data.points += addxp_messages - ((debuffs_actives.xp_debuff * addxp_messages) / 100) || 0;
 	user_data.points = Math.round10(user_data.points, -2);
 	
 	// NOTA(RECKER): Aumentar nivel

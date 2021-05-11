@@ -84,7 +84,7 @@ const damage_debuff = async (ctx) => {
 	// NOTA(RECKER): Obtener usuario
 	let user;
 	let sql;
-	let consume_xp = 35;
+	let consume_xp = 20;
 	if (!cancel) {
 		sql = `SELECT * FROM users WHERE username=$1`;
 			

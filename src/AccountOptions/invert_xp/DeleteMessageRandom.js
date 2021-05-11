@@ -84,7 +84,7 @@ const delete_message_random = async (ctx) => {
 	// NOTA(RECKER): Obtener usuario
 	let user;
 	let sql;
-	let consume_xp = 140;
+	let consume_xp = 25;
 	if (!cancel) {
 		sql = `SELECT * FROM users WHERE username=$1`;
 			

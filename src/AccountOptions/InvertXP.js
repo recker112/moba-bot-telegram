@@ -12,12 +12,12 @@ const { Client } = require('pg');
 // NOTA(RECKER): Botones
 const buttons = Markup.inlineKeyboard([
 	[
-		Markup.button.callback('Gana menos XP / 60XP', 'invertxp_xpD'),
-		Markup.button.callback('Menos vida base / 55XP', 'invertxp_vidaD'),
+		Markup.button.callback('Gana menos XP / 37XP', 'invertxp_xpD'),
+		Markup.button.callback('Menos vida base / 28XP', 'invertxp_vidaD'),
 	],
-	[Markup.button.callback('Menos daño base / 35XP', 'invertxp_damageD')],
-	[Markup.button.callback('Eliminar siguiente mensaje / 120XP', 'invertxp_deleteMD')],
-	[Markup.button.callback('Eliminar mensaje random / 140XP', 'invertxp_deleteMRD')],
+	[Markup.button.callback('Menos daño base / 20XP', 'invertxp_damageD')],
+	[Markup.button.callback('Eliminar siguiente mensaje / 20XP', 'invertxp_deleteMD')],
+	[Markup.button.callback('Eliminar mensaje random / 25XP', 'invertxp_deleteMRD')],
 	[Markup.button.callback('Regresar', 'returns')]
 ]);
 

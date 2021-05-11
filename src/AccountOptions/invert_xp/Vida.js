@@ -84,7 +84,7 @@ const vida_debuff = async (ctx) => {
 	// NOTA(RECKER): Obtener usuario
 	let user;
 	let sql;
-	let consume_xp = 55;
+	let consume_xp = 28;
 	if (!cancel) {
 		sql = `SELECT * FROM users WHERE username=$1`;
 			
@@ -111,7 +111,7 @@ const vida_debuff = async (ctx) => {
 			config = config.rows[0];
 			
 			// NOTA(RECKER): Agregar debufo
-			sql = `INSERT INTO debuffs(user_id, user_from, type, amount, xp_amount, expired_at) VALUES ($1, $2, 'vida_debuff', $3, $3 * $4, now()::timestamp + '48 hr'::INTERVAL)`;
+			sql = `INSERT INTO debuffs(user_id, user_from, type, amount, xp_amount, expired_at) VALUES ($1, $2, 'vida_debuff', $3, $4, now()::timestamp + '48 hr'::INTERVAL)`;
 
 			await client.query(sql, [user.id, ctx.from.id, params[1], consume_xp*params[1]]);
 			

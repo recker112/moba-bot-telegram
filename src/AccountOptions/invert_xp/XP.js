@@ -84,7 +84,7 @@ const xp_debuff = async (ctx) => {
 	// NOTA(RECKER): Obtener usuario
 	let user;
 	let sql;
-	let consume_xp = 60;
+	let consume_xp = 37;
 	if (!cancel) {
 		sql = `SELECT * FROM users WHERE username=$1`;
 			

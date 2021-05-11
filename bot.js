@@ -41,7 +41,7 @@ const { Client } = require('pg');
 const bot = new Telegraf(process.env.BOT_TOKEN);
 
 // NOTA(RECKER): Configuraciones de puntos
-process.env.VERSION = 'v2.0.0';
+process.env.VERSION = 'v2.0.3';
 bot.use((new PostgresSession({
 	connectionString: process.env.DATABASE_URL,
 		ssl: {
