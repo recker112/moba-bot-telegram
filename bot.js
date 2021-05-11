@@ -2,6 +2,7 @@
 const startOptions = require('./src/MainOptions/Start');
 const setupOptions = require('./src/MainOptions/Setup');
 const helpOptions = require('./src/MainOptions/Help');
+const codigoOptions = require('./src/MainOptions/Codigo');
 const registrar = require('./src/AccountOptions/Registrar');
 const cuentaOptions = require('./src/AccountOptions/Cuenta');
 const close = require('./src/Close');
@@ -72,6 +73,9 @@ bot.settings(settings.main);
 
 // NOTA(RECKER): Ayuda
 bot.help(helpOptions);
+
+// NOTA(RECKER): Codigo
+bot.command('codigo', codigoOptions);
 
 // NOTA(RECKER): Control XP
 bot.action(['settings_control_xp','settings_control_xp_add', 'settings_control_xp_remove'], controlXP);

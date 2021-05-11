@@ -16,6 +16,7 @@ const start = async (ctx) => {
 		{ command: '/install', description: 'Instala el bot en un chat' },
 		{ command: '/reset', description: 'Reinicia el score de todos los jugadores' },
 		{ command: '/help', description: 'Pide ayuda al bot' },
+		{ command: '/codigo', description: 'Ver el código del bot' },
 		{ command: '/registrar', description: 'Registrate para poder comenzar a jugar' },
 		{ command: '/cuenta', description: 'Maneja diferentes opciones de tu cuenta' },
 		{ command: '/settings', description: 'Configuraciones del sistema' },
