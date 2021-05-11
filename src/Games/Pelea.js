@@ -103,6 +103,7 @@ WHERE user_id=$1 AND expired_at > now() :: timestamp`;
 	let stats1 = {
 		vida_debuff: 0,
 		damage_debuff: 0,
+		xp_debuff: 0,
 	};
 	
 	debuffs.map((debuff) => {
@@ -145,6 +146,7 @@ WHERE user_id=$1 AND expired_at > now() :: timestamp`;
 	let stats2 = {
 		vida_debuff: 0,
 		damage_debuff: 0,
+		xp_debuff: 0,
 	};
 	
 	debuffs.map((debuff) => {
@@ -166,6 +168,7 @@ WHERE user_id=$1 AND expired_at > now() :: timestamp`;
 		}else {
 			debuff_add = stats2;
 		}
+		user.xp_debuff = debuff_add.xp_debuff;
 		
 		// NOTA(RECKER): Calculos
 		let damage_base = config.damage_base * user.level;
@@ -244,7 +247,8 @@ WHERE user_id=$1 AND expired_at > now() :: timestamp`;
 		await client.query(sql, [user_win.user_id,user_lose.user_id]);
 		
 		// NOTA(RECKER): Agregar xp al winner
-		user_win.points += 10 * config.double_exp;
+		let addxp_win = 10 * config.double_exp;
+		user_win.points += addxp_win - ((user_win.xp_debuff * addxp_win) / 100) || 0;
 		// NOTA(RECKER): Aumentar nivel
 		if (user_win.points >= (user_win.level * config.xp_need)) {
 			let levels = calculate_level(user_win.points, config.xp_need);
