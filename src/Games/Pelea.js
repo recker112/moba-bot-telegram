@@ -249,6 +249,7 @@ WHERE user_id=$1 AND expired_at > now() :: timestamp`;
 		// NOTA(RECKER): Agregar xp al winner
 		let addxp_win = 10 * config.double_exp;
 		user_win.points += addxp_win - ((user_win.xp_debuff * addxp_win) / 100) || 0;
+		user_win.points = Math.round10(user_win.points, -2);
 		// NOTA(RECKER): Aumentar nivel
 		if (user_win.points >= (user_win.level * config.xp_need)) {
 			let levels = calculate_level(user_win.points, config.xp_need);

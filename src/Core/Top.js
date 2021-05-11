@@ -89,7 +89,7 @@ ORDER BY experiences.points DESC LIMIT 1`;
 	}
 	
 	sql = `SELECT count(user_win) as count FROM fights WHERE user_win=$1`;
-	let wins = await client.query(sql,[ctx.from.id]);
+	let wins = await client.query(sql,[user.user_id]);
 	wins = wins.rows[0];
 	
 	client.end();
@@ -208,7 +208,7 @@ ORDER BY points DESC LIMIT 1 OFFSET ${offset}`;
 	}
 	
 	sql = `SELECT count(user_win) as count FROM fights WHERE user_win=$1`;
-	let wins = await client.query(sql,[ctx.from.id]);
+	let wins = await client.query(sql,[user.user_id]);
 	wins = wins.rows[0];
 	
 	client.end();
