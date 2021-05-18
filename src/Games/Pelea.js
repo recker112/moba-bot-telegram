@@ -191,7 +191,7 @@ WHERE user_id=$1 AND expired_at > now() :: timestamp`;
 	fight_log = `|--------- *BATALLA INICIADA* ---------|
 @${ctx.from.username} VS ${username}\n\n`;
 	
-	let round = 1;
+	let round = 0;
 	while(users[0].vida > 0 && users[1].vida > 0) {
 		const randomNumber = getRandomInt(0,99);
 		const randomNumberText = getRandomInt(0,golpes_type.length - 1);
@@ -216,29 +216,26 @@ WHERE user_id=$1 AND expired_at > now() :: timestamp`;
 	}
 	
 	// NOTA(RECKER): Mensajes especiales
-	if ((users[0].vida <= 0 || users[1].vida <= 0) && round === 1) {
+	if ((users[0].vida <= 0 || users[1].vida <= 0) && round === 0) {
 		// NOTA(RECKER): No vida
 		fight_log += '*Alguno de los jugadores no tienen vida suficiente para una batalla*';
-	}else if ((users[0].vida <= 0 || users[1].vida <= 0) && round === 2) {
+	}else if ((users[0].vida <= 0 || users[1].vida <= 0) && round === 1) {
 		// NOTA(RECKER): No vida
 		fight_log += '\n*DELETEADO PAPÁ*';
 	}
 	
 	// NOTA(RECKER): Asignar ganador
-	let user_win;
-	let user_lose;
+	let user_win = null;
+	let user_lose = null;
 	if (users[0].vida > 0 && users[1].vida <= 0) {
 		user_win = users[0];
 		user_lose = users[1];
 	} else if (users[1].vida > 0 && users[0].vida <= 0) {
 		user_win = users[1];
 		user_lose = users[0];
-	}else {
-		user_win=null;
-		user_lose=null;
 	}
 	
-	if (user_win) {
+	if (user_win && round > 0) {
 		fight_log += `\n\n*¡@${user_win.username} ganó la batalla!*`;
 		
 			// NOTA(RECKER): Registrar batalla
