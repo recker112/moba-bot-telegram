@@ -1,13 +1,19 @@
+// NOTA(RECKER): Iniciar variables
+const dotenv = require('dotenv');
+dotenv.config();
+
 // NOTA(RECKER): Conectarse a la DB
 const { Client } = require('pg');
 
-const start_db = async () => {
-	const client = new Client({
-		connectionString: process.env.DATABASE_URL,
+const options_db = {
+	connectionString: process.env.DATABASE_URL,
 		ssl: {
 			rejectUnauthorized: false
 		}
-	});
+}
+
+const start_db = async () => {
+	const client = new Client(options_db);
 	
 	await client.connect();
 	
@@ -151,12 +157,7 @@ const start_db = async () => {
 }
 
 const down_db = async () => {
-	const client = new Client({
-		connectionString: process.env.DATABASE_URL,
-		ssl: {
-			rejectUnauthorized: false
-		}
-	});
+	const client = new Client(options_db);
 	
 	await client.connect();
 	
@@ -190,4 +191,5 @@ const down_db = async () => {
 module.exports = {
 	start_db,
 	down_db,
+	options_db,
 };

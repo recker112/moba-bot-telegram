@@ -1,5 +1,6 @@
 // NOTA(RECKER): Conectarse a la DB
 const { Client } = require('pg');
+const { options_db } = require('../../DB');
 
 const { calculate_level } = require('../../Core/settings/AddXP');
 
@@ -45,12 +46,7 @@ Para cancelar simplemente escriba /cancel.`);
 
 const damage_debuff = async (ctx) => {
 	// NOTA(RECKER): Obtener configs
-	const client = new Client({
-		connectionString: process.env.DATABASE_URL,
-		ssl: {
-			rejectUnauthorized: false
-		}
-	});
+	const client = new Client(options_db);
 	
 	await client.connect();
 	
@@ -111,7 +107,7 @@ const damage_debuff = async (ctx) => {
 			config = config.rows[0];
 			
 			// NOTA(RECKER): Agregar debufo
-			sql = `INSERT INTO debuffs(user_id, user_from, type, amount, xp_amount, expired_at) VALUES ($1, $2, 'damage_debuff', $3, $4, now()::timestamp + '48 hr'::INTERVAL)`;
+			sql = `INSERT INTO debuffs(user_id, user_from, type, amount, xp_amount, expired_at) VALUES ($1, $2, 'damage_debuff', $3, $4, now()::timestamp + '30 days'::INTERVAL)`;
 
 			await client.query(sql, [user.id, ctx.from.id, params[1], consume_xp*params[1]]);
 			

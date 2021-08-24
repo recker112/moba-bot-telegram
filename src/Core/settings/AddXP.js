@@ -1,5 +1,6 @@
 // NOTA(RECKER): Conectarse a la DB
 const { Client } = require('pg');
+const { options_db } = require('../../DB');
 
 const calculate_level = (xp, xp_need) => {
 	let level = 1;
@@ -60,12 +61,7 @@ Para cancelar simplemente escriba /cancel`);
 
 const addxp = async (ctx) => {
 	// NOTA(RECKER): Obtener configs
-	const client = new Client({
-		connectionString: process.env.DATABASE_URL,
-		ssl: {
-			rejectUnauthorized: false
-		}
-	});
+	const client = new Client(options_db);
 	
 	await client.connect();
 	

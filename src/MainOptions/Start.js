@@ -1,5 +1,6 @@
 // NOTA(RECKER): Conectarse a la DB
 const { Client } = require('pg');
+const { options_db } = require('../DB');
 
 // NOTA(RECKER): DB
 const { start_db } = require('../DB');
@@ -29,12 +30,7 @@ const start = async (ctx) => {
 		{ command: '/golpelist', description: 'Lista de golpes disponibles' },
 	];
 	
-	const client = new Client({
-		connectionString: process.env.DATABASE_URL,
-		ssl: {
-			rejectUnauthorized: false
-		}
-	});
+	const client = new Client(options_db);
 	
 	await client.connect();
 	

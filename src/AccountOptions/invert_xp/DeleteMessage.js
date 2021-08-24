@@ -1,5 +1,6 @@
 // NOTA(RECKER): Conectarse a la DB
 const { Client } = require('pg');
+const { options_db } = require('../../DB');
 
 const { calculate_level } = require('../../Core/settings/AddXP');
 
@@ -45,12 +46,7 @@ Para cancelar simplemente escriba /cancel.`);
 
 const delete_message = async (ctx) => {
 	// NOTA(RECKER): Obtener configs
-	const client = new Client({
-		connectionString: process.env.DATABASE_URL,
-		ssl: {
-			rejectUnauthorized: false
-		}
-	});
+	const client = new Client(options_db);
 	
 	await client.connect();
 	

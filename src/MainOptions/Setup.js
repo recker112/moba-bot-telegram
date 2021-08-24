@@ -2,6 +2,7 @@ const { Markup } = require('telegraf');
 
 // NOTA(RECKER): Conectarse a la DB
 const { Client } = require('pg');
+const { options_db } = require('../DB');
 
 const buttons = Markup.inlineKeyboard([
 	[Markup.button.callback('Confirmar', 'confirm_install'), Markup.button.callback('Cancelar', 'close')],
@@ -9,12 +10,7 @@ const buttons = Markup.inlineKeyboard([
 
 const install = async (ctx) => {
 	// NOTA(RECKER): Obtener configuracion
-	const client = new Client({
-		connectionString: process.env.DATABASE_URL,
-		ssl: {
-			rejectUnauthorized: false
-		}
-	});
+	const client = new Client(options_db);
 	
 	await client.connect();
 	
@@ -35,7 +31,7 @@ const install = async (ctx) => {
 		return null;
 	}
 	
-	if (ctx.message.chat.type !== 'supergroup') {
+	if (ctx.message.chat.type !== 'supergroup' && ctx.message.chat.type !== 'group') {
 		let response = await ctx.reply('Solo puede usar este comando en un grupo');
 		
 		setTimeout(() => {
@@ -80,12 +76,7 @@ const confirm_install = async (ctx) => {
 	}
 	let query = ctx.session.querys[found_id];
 	
-	const client = new Client({
-		connectionString: process.env.DATABASE_URL,
-		ssl: {
-			rejectUnauthorized: false
-		}
-	});
+	const client = new Client(options_db);
 	
 	await client.connect();
 	

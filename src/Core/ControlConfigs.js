@@ -1,6 +1,3 @@
-// NOTA(RECKER): Conectarse a la DB
-const { Client } = require('pg');
-
 const { init_state } = require('./Settings');
 const { Markup } = require('telegraf');
 const { vida_base_awaitResponse } = require('./settings/VidaBase');

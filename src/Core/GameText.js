@@ -1,5 +1,6 @@
 // NOTA(RECKER): Conectarse a la DB
 const { Client } = require('pg');
+const { options_db } = require('../DB');
 const { calculate_level } = require('./settings/AddXP');
 
 const { removexp } = require('./settings/RemoveXP');
@@ -17,8 +18,6 @@ const { removegolpe } = require('./settings/RemoveGolpe');
 const { xp_debuff } = require('../AccountOptions/invert_xp/XP');
 const { vida_debuff } = require('../AccountOptions/invert_xp/Vida');
 const { damage_debuff } = require('../AccountOptions/invert_xp/Damage');
-const { delete_message } = require('../AccountOptions/invert_xp/DeleteMessage');
-const { delete_message_random } = require('../AccountOptions/invert_xp/DeleteMessageRandom');
 
 function getRandomInt(min, max) {
   return Math.round(Math.random() * (max - min)) + min;
@@ -90,14 +89,6 @@ const awaitResponse = async (ctx) => {
 			await damage_debuff(ctx);
 			break;
 			
-		case 'delete_message':
-			await delete_message(ctx);
-			break;
-			
-		case 'delete_message_random':
-			await delete_message_random(ctx);
-			break;
-			
 		default:
 			ctx.session.awaitResponse.splice(awaitID,1);
 			ctx.session.awaitID = null;
@@ -112,12 +103,7 @@ const gameText = async (ctx) => {
 	}
 	
 	// NOTA(RECKER): Obtener datos de la db
-	const client = new Client({
-		connectionString: process.env.DATABASE_URL,
-		ssl: {
-			rejectUnauthorized: false
-		}
-	});
+	const client = new Client(options_db);
 	
 	await client.connect();
 	
@@ -152,8 +138,6 @@ WHERE user_id=$1 AND expired_at > now() :: timestamp`;
 	
 	let debuffs_actives = {
 		xp_debuff: 0,
-		delete_message: 0,
-		delete_message_random: 0,
 		user_from: {},
 	};
 
@@ -161,9 +145,12 @@ WHERE user_id=$1 AND expired_at > now() :: timestamp`;
 		let keys = Object.keys(debuffs_actives);
 		keys.map((key) => {
 			if (debuff.type === key) {
-				debuffs_actives[key] += debuff.amount;
+				debuffs_actives[key] += debuff.amount > 0 ? debuff.amount : 0;
 				
-				// NOTA(RECKER): Obtener el username_from
+				// NOTA(RECKER): Reducir a 75
+				debuffs_actives[key] = debuffs_actives[key] > 75 ? 75 : debuffs_actives[key];
+				
+				// NOTA(RECKER): Obtener el username_from del primer debuff
 				debuffs_actives.user_from[key] = !debuffs_actives.user_from[key] ? {
 					username: debuff.username,
 					id: debuff.id
@@ -173,26 +160,26 @@ WHERE user_id=$1 AND expired_at > now() :: timestamp`;
 	});
 	
 	// Aplicar debuffos especiales
-	const random = getRandomInt(0,99);
+	/*const random = getRandomInt(0,99);
 	if (debuffs_actives.delete_message) {
 		ctx.deleteMessage(ctx.message.message_id);
 		ctx.reply(`@${debuffs_actives.user_from.delete_message.username} pagó para borrar este mensaje de @${ctx.from.username}`);
 		
-		// NOTA(RECKER): Obtener xp debuff
+		// NOTA(RECKER): Quitar un amount
 		sql = `UPDATE debuffs SET amount=amount-1 WHERE id=$1`;
 
 		await client.query(sql,[debuffs_actives.user_from.delete_message.id]);
 		return null;
-	}else if (debuffs_actives.delete_message_random && random > 75) {
+	}else if (debuffs_actives.delete_message_random && true) {
 		ctx.deleteMessage(ctx.message.message_id);
 		ctx.reply(`@${debuffs_actives.user_from.delete_message_random.username} pagó para borrar a lo random este mensaje de @${ctx.from.username}`);
 		
-		// NOTA(RECKER): Obtener xp debuff
+		// NOTA(RECKER): Quitar un amount
 		sql = `UPDATE debuffs SET amount=amount-1 WHERE id=$1`;
 
 		await client.query(sql,[debuffs_actives.user_from.delete_message_random.id]);
 		return null;
-	}
+	}¨*/
 	
 	// NOTA(RECKER): Obtener menciones
 	let mentions = ctx.message.entities || [];

@@ -2,6 +2,7 @@ const { Markup } = require('telegraf');
 
 // NOTA(RECKER): Conectarse a la DB
 const { Client } = require('pg');
+const { options_db } = require('../DB');
 
 // NOTA(RECKER): DB
 const { start_db, down_db } = require('../DB');
@@ -11,12 +12,7 @@ const buttons = Markup.inlineKeyboard([
 ]);
 
 const reset = async (ctx) => {
-	const client = new Client({
-		connectionString: process.env.DATABASE_URL,
-		ssl: {
-			rejectUnauthorized: false
-		}
-	});
+	const client = new Client(options_db);
 	
 	await client.connect();
 	
@@ -70,12 +66,7 @@ const confirm_reset = async (ctx) => {
 	}
 	let query = ctx.session.querys[found_id];
 	
-	const client = new Client({
-		connectionString: process.env.DATABASE_URL,
-		ssl: {
-			rejectUnauthorized: false
-		}
-	});
+	const client = new Client(options_db);
 	
 	await client.connect();
 	

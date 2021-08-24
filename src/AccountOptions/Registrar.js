@@ -1,13 +1,9 @@
 // NOTA(RECKER): Conectarse a la DB
 const { Client } = require('pg');
+const { options_db } = require('../DB');
 
 const registrar = async (ctx) => {
-	const client = new Client({
-		connectionString: process.env.DATABASE_URL,
-		ssl: {
-			rejectUnauthorized: false
-		}
-	});
+	const client = new Client(options_db);
 	
 	await client.connect();
 	
@@ -33,7 +29,7 @@ const registrar = async (ctx) => {
 
 	// NOTA(RECKER): Evitar el registro
 	if (user) {
-		let response = await ctx.reply('Ya estás registrado');
+		let response = await ctx.reply('Ya estรกs registrado');
 		
 		setTimeout(() => {
 			ctx.deleteMessage(response.message_id);
@@ -55,7 +51,7 @@ const registrar = async (ctx) => {
 	
 	ctx.deleteMessage(ctx.message.id);
 	
-	ctx.reply(`@${ctx.from.username} se unió al campo de batalla`);
+	ctx.reply(`@${ctx.from.username} se uniรณ al campo de batalla`);
 	await client.end();
 }
 

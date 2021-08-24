@@ -1,16 +1,12 @@
 // NOTA(RECKER): Conectarse a la DB
 const { Client } = require('pg');
+const { options_db } = require('../DB');
 
 const { calculate_level } = require('./settings/AddXP');
 
 const gameOthers = async (ctx) => {
 	// NOTA(RECKER): Obtener datos de la db
-	const client = new Client({
-		connectionString: process.env.DATABASE_URL,
-		ssl: {
-			rejectUnauthorized: false
-		}
-	});
+	const client = new Client(options_db);
 	
 	await client.connect();
 	

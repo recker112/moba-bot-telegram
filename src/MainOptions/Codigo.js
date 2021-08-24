@@ -1,8 +1,5 @@
 const { Markup } = require('telegraf');
 
-// NOTA(RECKER): Conectarse a la DB
-const { Client } = require('pg');
-
 const buttons = Markup.inlineKeyboard([
 	[Markup.button.callback('Cerrar', 'close')]
 ]);

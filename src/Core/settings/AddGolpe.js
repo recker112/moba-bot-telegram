@@ -1,5 +1,6 @@
 // NOTA(RECKER): Conectarse a la DB
 const { Client } = require('pg');
+const { options_db } = require('../../DB');
 
 const addgolpe_awaitResponse =  async (ctx) => {
 	let response = await ctx.replyWithMarkdown(`Para agregar un *GOLPE* al sistema use el siguiente formato:
@@ -44,12 +45,7 @@ Para cancelar simplemente escriba /cancel.`);
 
 const addgolpe = async (ctx) => {
 	// NOTA(RECKER): Obtener configs
-	const client = new Client({
-		connectionString: process.env.DATABASE_URL,
-		ssl: {
-			rejectUnauthorized: false
-		}
-	});
+	const client = new Client(options_db);
 	
 	await client.connect();
 	
@@ -116,7 +112,7 @@ Para cancelar simplemente escriba /cancel.`);
 
 Si desea cancelar puede usar el comando /cancel.`);
 	}else if (querys > inserts && !cancel_user) {
-		response = await ctx.replyreplyWithMarkdown(`Algunas lineas fueron procesadas correctamente, los errores en las demás lineas se debe a:
+		response = await ctx.replyreplyWithMarkdown(`Algunas lineas fueron procesadas correctamente, los errores en las demรกs lineas se debe a:
 
 1) El formato no es correcto.
 2) Ya existe en la base de datos.
@@ -126,7 +122,7 @@ Si desea cancelar puede usar el comando /cancel.`);
 	} else if (querys && inserts && querys === inserts && !cancel_user) {
 		response = await ctx.replyWithMarkdown('Golpes agregados!');
 	} else {
-		response = await ctx.replyWithMarkdown('Acción cancelada!');
+		response = await ctx.replyWithMarkdown('Acciรณn cancelada!');
 	}
 	
 	// NOTA(RECKER): Agregar mensaje del usuario

@@ -1,6 +1,3 @@
-// NOTA(RECKER): Conectarse a la DB
-const { Client } = require('pg');
-
 const { init_state } = require('./Settings');
 const { Markup } = require('telegraf');
 const { addword1_awaitResponse } = require('./settings/AddWords1');

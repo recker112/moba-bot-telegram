@@ -1,14 +1,10 @@
 // NOTA(RECKER): Conectarse a la DB
 const { Client } = require('pg');
+const { options_db } = require('../../DB');
 
 const aggressiveness_awaitResponse =  async (ctx) => {
 	// NOTA(RECKER): Obtener configuracion
-	const client = new Client({
-		connectionString: process.env.DATABASE_URL,
-		ssl: {
-			rejectUnauthorized: false
-		}
-	});
+	const client = new Client(options_db);
 	
 	await client.connect();
 	
@@ -68,12 +64,7 @@ Si desea cancelar esta acción puede usar /cancel.`);
 
 const aggressiveness = async (ctx) => {
 	// NOTA(RECKER): Obtener configs
-	const client = new Client({
-		connectionString: process.env.DATABASE_URL,
-		ssl: {
-			rejectUnauthorized: false
-		}
-	});
+	const client = new Client(options_db);
 	
 	await client.connect();
 	

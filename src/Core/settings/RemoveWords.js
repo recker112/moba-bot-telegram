@@ -1,5 +1,6 @@
 // NOTA(RECKER): Conectarse a la DB
 const { Client } = require('pg');
+const { options_db } = require('../../DB');
 
 const removeword_awaitResponse =  async (ctx) => {
 	let response = await ctx.reply(`Para eliminar una palabra del sistema use el siguiente formato:
@@ -45,12 +46,7 @@ Para cancelar simplemente escriba /cancel.`);
 
 const removeword = async (ctx) => {
 	// NOTA(RECKER): Obtener configs
-	const client = new Client({
-		connectionString: process.env.DATABASE_URL,
-		ssl: {
-			rejectUnauthorized: false
-		}
-	});
+	const client = new Client(options_db);
 	
 	await client.connect();
 	
@@ -115,7 +111,7 @@ Para cancelar simplemente escriba /cancel.`);
 
 Si desea cancelar puede usar el comando /cancel.`);
 	}else if (querys > deletes && !cancel_user) {
-		response = await ctx.reply(`Algunas lineas fueron procesadas correctamente, los errores en las demás lineas se debe a:
+		response = await ctx.reply(`Algunas lineas fueron procesadas correctamente, los errores en las demรกs lineas se debe a:
 
 1) El formato no es correcto.
 2) No se encuentra en la base de datos.
@@ -125,7 +121,7 @@ Si desea cancelar puede usar el comando /cancel.`);
 	} else if (querys && deletes && querys === deletes && !cancel_user) {
 		response = await ctx.replyWithMarkdown('Palabras eliminadas!');
 	} else {
-		response = await ctx.replyWithMarkdown('Acción cancelada!');
+		response = await ctx.replyWithMarkdown('Acciรณn cancelada!');
 	}
 	
 	// NOTA(RECKER): Agregar mensaje del usuario

@@ -2,6 +2,7 @@ const { Markup } = require('telegraf');
 
 // NOTA(RECKER): Conectarse a la DB
 const { Client } = require('pg');
+const { options_db } = require('../DB');
 
 // NOTA(RECKER): Botones
 const buttons_init = Markup.inlineKeyboard([
@@ -41,12 +42,7 @@ const top = async (ctx) => {
 	}
 	
 	// NOTA(RECKER): Obtener configuracion
-	const client = new Client({
-		connectionString: process.env.DATABASE_URL,
-		ssl: {
-			rejectUnauthorized: false
-		}
-	});
+	const client = new Client(options_db);
 	
 	await client.connect();
 	
@@ -245,56 +241,6 @@ Cariñosidad: ${user.smoothness}%`
 	}else {
 		init_state.text += `\n\nNadie está en el top ${offset + 1}`
 	}
-	
-	try {
-		let response = await ctx.editMessageText(init_state.text, {
-			reply_markup: init_state.buttons.reply_markup,
-		});
-	} catch(e) {
-		console.log('No changes message');
-	}
-}
-
-const list_words2 = async (ctx) => {
-	// NOTA(RECKER): Verificar que los querys sean un objeto
-	if (typeof ctx.session.querys !== 'object') {
-		return null;
-	}
-	
-	// NOTA(RECKER): Buscar query
-	let found_id = ctx.session.querys.findIndex((query) => query.id === ctx.update.callback_query.message.message_id)
-	
-	
-	if (found_id <= -1) {
-		ctx.answerCbQuery('Permiso denegado');
-		return null;
-	}
-	
-	// NOTA(RECKER): Obtener configuracion
-	const client = new Client({
-		connectionString: process.env.DATABASE_URL,
-		ssl: {
-			rejectUnauthorized: false
-		}
-	});
-	
-	await client.connect();
-	
-	let sql = 'SELECT * FROM words WHERE status=2';
-
-	let words = await client.query(sql);
-	words = words.rows;
-	
-	client.end();
-	
-	let wordsList = '';
-	words.map(({ word, status }) => {
-		wordsList = wordsList + `- ${word}\n`;
-	})
-	
-	init_state.text = `Lista de palabras cariñosas:
-
-${wordsList}`;
 	
 	try {
 		let response = await ctx.editMessageText(init_state.text, {

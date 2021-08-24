@@ -29,7 +29,7 @@ const dotenv = require('dotenv');
 dotenv.config();
 
 // NOTA(RECKER): DB
-require('./src/DB');
+const { options_db } = require('./src/DB');
 
 require('./src/parseCeil');
 
@@ -41,14 +41,10 @@ const { Client } = require('pg');
 
 const bot = new Telegraf(process.env.BOT_TOKEN);
 
-// NOTA(RECKER): Configuraciones de puntos
+// NOTA(RECKER): Variables Globales
 process.env.VERSION = 'v2.0.5';
-bot.use((new PostgresSession({
-	connectionString: process.env.DATABASE_URL,
-		ssl: {
-			rejectUnauthorized: false
-		}
-})).middleware());
+
+bot.use((new PostgresSession(options_db)).middleware());
 
 bot.telegram.getMe().then((botInfo) => {
 	bot.options.username = botInfo.username

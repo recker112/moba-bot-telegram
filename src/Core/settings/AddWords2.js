@@ -1,5 +1,6 @@
 // NOTA(RECKER): Conectarse a la DB
 const { Client } = require('pg');
+const { options_db } = require('../../DB');
 
 const addword2_awaitResponse =  async (ctx) => {
 	let response = await ctx.reply(`Para una *PALABRA CARIÑOSA* al sistema use el siguiente formato:
@@ -45,12 +46,7 @@ Para cancelar simplemente escriba /cancel.`);
 
 const addword2 = async (ctx) => {
 	// NOTA(RECKER): Obtener configs
-	const client = new Client({
-		connectionString: process.env.DATABASE_URL,
-		ssl: {
-			rejectUnauthorized: false
-		}
-	});
+	const client = new Client(options_db);
 	
 	await client.connect();
 	

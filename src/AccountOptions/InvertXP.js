@@ -1,13 +1,12 @@
+// NOTA(RECKER): Conectarse a la DB
+const { Client } = require('pg');
+const { options_db } = require('../DB');
+
 const { Markup } = require('telegraf');
 let { init_state } = require('./Cuenta');
 const { xp_debuff_awaitResponse } = require('./invert_xp/XP');
 const { vida_debuff_awaitResponse } = require('./invert_xp/Vida');
 const { damage_debuff_awaitResponse } = require('./invert_xp/Damage');
-const { delete_message_awaitResponse } = require('./invert_xp/DeleteMessage');
-const { delete_message_random_awaitResponse } = require('./invert_xp/DeleteMessageRandom');
-
-// NOTA(RECKER): Conectarse a la DB
-const { Client } = require('pg');
 
 // NOTA(RECKER): Botones
 const buttons = Markup.inlineKeyboard([
@@ -16,8 +15,6 @@ const buttons = Markup.inlineKeyboard([
 		Markup.button.callback('Menos vida base / 28XP', 'invertxp_vidaD'),
 	],
 	[Markup.button.callback('Menos daño base / 20XP', 'invertxp_damageD')],
-	[Markup.button.callback('Eliminar siguiente mensaje / 20XP', 'invertxp_deleteMD')],
-	[Markup.button.callback('Eliminar mensaje random / 25XP', 'invertxp_deleteMRD')],
 	[Markup.button.callback('Regresar', 'returns')]
 ]);
 
@@ -46,21 +43,10 @@ const main = async (ctx) => {
 	}else if (ctx.match[0] === 'invertxp_damageD') {
 		await damage_debuff_awaitResponse(ctx);
 		return null;
-	}else if (ctx.match[0] === 'invertxp_deleteMD') {
-		await delete_message_awaitResponse(ctx);
-		return null;
-	}else if (ctx.match[0] === 'invertxp_deleteMRD') {
-		await delete_message_random_awaitResponse(ctx);
-		return null;
 	}
 	
 	// NOTA(RECKER): Obtener datos de la db
-	const client = new Client({
-		connectionString: process.env.DATABASE_URL,
-		ssl: {
-			rejectUnauthorized: false
-		}
-	});
+	const client = new Client(options_db);
 	
 	await client.connect();
 	
@@ -70,7 +56,7 @@ const main = async (ctx) => {
 	let user = await client.query(sql,[ctx.from.id]);
 	user = user.rows[0];
 	
-	let text = '¿En qué puedes invertir tu XP? En molestar a los demás.\nLa forma correcta de leer los botones es la siguiente: {Efecto} / {XP por cada punto o porcentaje}.\nTen en cuenta que la duración de un debuff solo es de 48h, después de haber transcurrido ese tiempo el debuff expirará.';
+	let text = '¿En qué puedes invertir tu XP? En molestar a los demás.\nLa forma correcta de leer los botones es la siguiente: {Efecto} / {XP por cada punto o porcentaje}.\nTen en cuenta que la duración de un debuff solo es de 30 días, después de haber transcurrido ese tiempo el debuff dejará de hacer efecto.';
 	
 	let response = await ctx.editMessageText(text, {
 		reply_markup: buttons.reply_markup

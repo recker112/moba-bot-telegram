@@ -2,6 +2,7 @@ const { Markup } = require('telegraf');
 
 // NOTA(RECKER): Conectarse a la DB
 const { Client } = require('pg');
+const { options_db } = require('../DB');
 
 // NOTA(RECKER): Botones
 const buttons_init = Markup.inlineKeyboard([
@@ -16,12 +17,7 @@ let init_state = {
 
 const main = async (ctx) => {
 	// NOTA(RECKER): Obtener configuracion
-	const client = new Client({
-		connectionString: process.env.DATABASE_URL,
-		ssl: {
-			rejectUnauthorized: false
-		}
-	});
+	const client = new Client(options_db);
 	
 	await client.connect();
 	
