@@ -42,7 +42,7 @@ const { Client } = require('pg');
 const bot = new Telegraf(process.env.BOT_TOKEN);
 
 // NOTA(RECKER): Variables Globales
-process.env.VERSION = 'v2.0.5';
+process.env.VERSION = 'v2.0.6';
 
 bot.use((new PostgresSession(options_db)).middleware());
 
